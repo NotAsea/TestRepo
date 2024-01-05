@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http.HttpResults;
+using TestRepo.Models;
 
 namespace TestRepo.Routes;
 
@@ -9,10 +10,10 @@ public static class PersonRoute
 {
     /// <summary>
     /// this consumes the <see cref="RouteGroupBuilder"/> and handle all logic and child route. <br />
-    /// This method must be and mean to be called last of <c>Map{Verb}</c> chain, as it return <see cref="Void"/> 
+    /// This method must be and mean to be called last of <c>Map{Verb}</c> chain, as it return <see cref="Void"/>
     /// </summary>
     /// <param name="route"></param>
-    public static void HandlePersonRoute(this RouteGroupBuilder route)
+    public static void HandlePersonRoute(this IEndpointRouteBuilder route)
     {
         route.MapGet("/", GetAllPerson);
         route.MapGet("/{id:int}", GetPerson);
@@ -25,11 +26,11 @@ public static class PersonRoute
     }
 
     private static async Task<Results<Ok<int>, BadRequest<string>>> CreatePerson(
-        ILogger logger,
-        IRepository repository,
+        [AsParameters] PersonRouteDefaultParam param,
         Person person
     )
     {
+        var (logger, repository) = param;
         var msg = new StringBuilder();
         if (string.IsNullOrEmpty(person.Name))
             msg.Append("Name cannot be null or Empty,");
@@ -55,12 +56,12 @@ public static class PersonRoute
     }
 
     private static async Task<Results<Ok<int>, NotFound<string>>> DeletePerson(
-        ILogger logger,
-        IRepository repository,
+        [AsParameters] PersonRouteDefaultParam param,
         int id,
         bool force = false
     )
     {
+        var (logger, repository) = param;
         try
         {
             var person = await repository.GetAsync<Person>(p => p.Id == id);
@@ -85,13 +86,13 @@ public static class PersonRoute
     }
 
     private static async Task<Results<Ok<int>, NotFound<string>>> DeleteList(
-        ILogger logger,
-        IRepository repository,
+        [AsParameters] PersonRouteDefaultParam param,
         MyAppContext context,
         [FromBody] int[] peopleId,
         bool force = false
     )
     {
+        var (logger, repository) = param;
         try
         {
             var people = await repository.GetListAsync<Person>(p => peopleId.Contains(p.Id), false);
@@ -117,11 +118,11 @@ public static class PersonRoute
     }
 
     private static async Task<Results<JsonHttpResult<Person>, NotFound<string>>> GetPerson(
-        ILogger logger,
-        IRepository repository,
+        [AsParameters] PersonRouteDefaultParam param,
         int id
     )
     {
+        var (logger, repository) = param;
         try
         {
             var res = await repository.GetAsync<Person>(p => p.Id == id && !p.IsDeleted, true);
@@ -134,16 +135,32 @@ public static class PersonRoute
         }
     }
 
-    private static async Task<Results<JsonHttpResult<List<Person>>, NotFound<string>>> GetAllPerson(
-        ILogger logger,
-        IRepository repository
+    private static async Task<Results<JsonHttpResult<ListReturn>, NotFound<string>>> GetAllPerson(
+        [AsParameters] PersonRouteDefaultParam param,
+        [AsParameters] SearchPersonParam search
     )
     {
+        var (logger, repository) = param;
         try
         {
-            var spec = new Specification<Person> { OrderBy = p => p.OrderBy(t => t.Id) };
-            var res = await repository.GetListAsync(spec, true);
-            return TypedResults.Json(res, PersonSerializer.Default.ListPerson);
+            search = search.Verify();
+            var spec = new PaginationSpecification<Person>
+            {
+                PageIndex = search.Index,
+                PageSize = search.Size,
+                OrderByDynamic = (search.SortBy, search.SortType)
+            };
+            if (!string.IsNullOrEmpty(search.NameSearch))
+                spec.Conditions.Add(
+                    p =>
+                        p.Name.Contains(search.NameSearch)
+                        || (!string.IsNullOrEmpty(p.Email) && p.Email.Contains(search.NameSearch))
+                );
+            var res = await repository.GetListAsync(spec);
+            return TypedResults.Json(
+                new ListReturn(res.Items, res.TotalItems),
+                PersonSerializer.Default.ListReturn
+            );
         }
         catch (Exception ex)
         {
@@ -153,11 +170,11 @@ public static class PersonRoute
     }
 
     private static async Task<Results<Ok<int>, BadRequest<string>>> UpdatePerson(
-        ILogger logger,
-        IRepository repository,
+        [AsParameters] PersonRouteDefaultParam param,
         Person person
     )
     {
+        var (logger, repository) = param;
         var msg = new StringBuilder();
         if (string.IsNullOrEmpty(person.Name))
             msg.Append("Name cannot be null or Empty,");
@@ -185,11 +202,11 @@ public static class PersonRoute
     }
 
     private static async Task<Results<Ok<int>, BadRequest<string>>> ActivatePerson(
-        ILogger logger,
-        IRepository repository,
+        [AsParameters] PersonRouteDefaultParam param,
         int id
     )
     {
+        var (logger, repository) = param;
         try
         {
             var person = await repository.GetByIdAsync<Person>(id);
@@ -209,12 +226,12 @@ public static class PersonRoute
     }
 
     private static async Task<Results<Ok<int>, BadRequest<string>>> ActivatePeople(
-        ILogger logger,
-        IRepository repository,
+        [AsParameters] PersonRouteDefaultParam param,
         MyAppContext context,
         [FromBody] int[] ids
     )
     {
+        var (logger, repository) = param;
         try
         {
             var people = await repository.GetListAsync<Person>(p => ids.Contains(p.Id), false);
@@ -249,6 +266,8 @@ internal static partial class CompileRegex
     public static bool VerifyEmail(string email) => EmailRegex().IsMatch(email);
 }
 
-[JsonSerializable(typeof(Person))]
+[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
+[JsonSerializable(typeof(ListReturn))]
 [JsonSerializable(typeof(List<Person>))]
+[JsonSerializable(typeof(Person))]
 internal partial class PersonSerializer : JsonSerializerContext;
