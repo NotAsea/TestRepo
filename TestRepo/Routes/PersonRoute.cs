@@ -175,15 +175,9 @@ public static class PersonRoute
     )
     {
         var (logger, repository) = param;
-        var msg = new StringBuilder();
-        if (string.IsNullOrEmpty(person.Name))
-            msg.Append("Name cannot be null or Empty,");
-        if (!string.IsNullOrEmpty(person.Email) && !CompileRegex.VerifyEmail(person.Email))
-            msg.Append("Wrong format Email,");
-        if (person.Id == 0)
-            msg.Append("Id cannot be zero,");
-        if (msg.Length > 0)
-            return TypedResults.BadRequest(msg.ToString().TrimEnd(','));
+        var msg = person.Verify();
+        if (!string.IsNullOrEmpty(msg))
+            return TypedResults.BadRequest(msg);
         await using var transaction = await repository.BeginTransactionAsync();
         try
         {

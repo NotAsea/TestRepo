@@ -1,5 +1,8 @@
 ﻿// ReSharper disable ClassNeverInstantiated.Global
 
+using System.Text;
+using TestRepo.Routes;
+
 namespace TestRepo.Models;
 
 internal record ListReturn(List<Person> Data, long Count);
@@ -31,5 +34,20 @@ internal static class SearchPersonParamVerifier
             SortBy = !string.IsNullOrEmpty(param.SortBy) ? param.SortBy.ToUpper() : "Id",
             SortType = sortType
         };
+    }
+}
+
+internal static class PersonVerifier
+{
+    internal static string Verify(this Person person)
+    {
+        var msg = new StringBuilder();
+        if (string.IsNullOrEmpty(person.Name))
+            msg.Append("Name cannot be null or Empty,");
+        if (!string.IsNullOrEmpty(person.Email) && !CompileRegex.VerifyEmail(person.Email))
+            msg.Append("Wrong format Email,");
+        if (person.Id == 0)
+            msg.Append("Id cannot be zero,");
+        return msg.Length > 0 ? msg.ToString().TrimEnd(',') : string.Empty;
     }
 }
