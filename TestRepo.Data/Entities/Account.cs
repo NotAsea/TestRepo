@@ -1,6 +1,7 @@
-﻿namespace TestRepo.Data.Entities;
+﻿// ReSharper disable PropertyCanBeMadeInitOnly.Global
+namespace TestRepo.Data.Entities;
 
-public class Account
+internal class Account
 {
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }

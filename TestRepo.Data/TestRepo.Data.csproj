@@ -14,10 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EditorConfigFiles Remove="D:\C#\TestRepo\TestRepo.Data\Migrations\.editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="D:\C#\TestRepo\TestRepo.Data\Migrations\.editorconfig" />
   </ItemGroup>
 

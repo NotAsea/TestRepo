@@ -2,7 +2,7 @@
 
 namespace TestRepo.Data;
 
-public static class SeedData
+internal static class SeedData
 {
     private static readonly Faker<Entities.Person> Faker = new Faker<Entities.Person>()
         .Ignore(p => p.Id)

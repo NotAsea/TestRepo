@@ -1,9 +1,10 @@
 ﻿using TestRepo.Data.Entities;
+// ReSharper disable ReturnTypeCanBeEnumerable.Global
 
 namespace TestRepo.Data;
 
 public class MyAppContext(DbContextOptions<MyAppContext> options) : DbContext(options)
 {
-    public DbSet<Person> Persons => Set<Person>();
-    public DbSet<Account> Accounts => Set<Account>();
+    internal DbSet<Person> Persons => Set<Person>();
+    internal DbSet<Account> Accounts => Set<Account>();
 }

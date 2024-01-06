@@ -7,13 +7,7 @@ public static class BootstrapDb
         try
         {
             await using var scope = app.Services.CreateAsyncScope();
-            var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
-            var context = scope.ServiceProvider.GetRequiredService<MyAppContext>();
-            await context.Database.EnsureCreatedAsync();
-            if (!await repository.ExistsAsync<Person>())
-            {
-                await context.BulkInsertAsync(SeedData.GetPeople());
-            }
+            await scope.ServiceProvider.InitDb();
         }
         catch (Exception ex)
         {

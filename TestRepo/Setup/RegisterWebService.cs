@@ -1,4 +1,6 @@
-﻿namespace TestRepo.Setup;
+﻿using TestRepo.Service.Models;
+
+namespace TestRepo.Setup;
 
 internal static class SetupWebApp
 {
@@ -10,15 +12,17 @@ internal static class SetupWebApp
     {
         builder.Services.AddEndpointsApiExplorer().AddHttpContextAccessor();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddRepository(builder.Configuration.GetConnectionString("default")!);
-        builder
-            .Services
-            .AddTransient(p =>
-            {
-                var logFactory = p.GetRequiredService<ILoggerFactory>();
-                var httpContext = p.GetRequiredService<IHttpContextAccessor>().HttpContext!;
-                return logFactory.CreateLogger(httpContext.Request.Path);
-            });
+        builder.Services.AddService(builder.Configuration.GetConnectionString("default")!);
+        builder.Services.AddTransient(p =>
+        {
+            var logFactory = p.GetRequiredService<ILoggerFactory>();
+            var httpContext = p.GetRequiredService<IHttpContextAccessor>().HttpContext!;
+            return logFactory.CreateLogger(httpContext.Request.Path);
+        });
+        builder.Services.Configure<JsonOptions>(config =>
+        {
+            config.JsonSerializerOptions.TypeInfoResolverChain.Add(PersonSerializer.Default);
+        });
     }
 
     /// <summary>

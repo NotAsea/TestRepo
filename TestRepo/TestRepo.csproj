@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TestRepo.Data\TestRepo.Data.csproj" />
+    <ProjectReference Include="..\TestRepo.Service\TestRepo.Service.csproj" />
   </ItemGroup>
 
 </Project>
