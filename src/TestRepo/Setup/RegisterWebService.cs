@@ -22,13 +22,11 @@ internal static class SetupWebApp
             var httpContext = p.GetRequiredService<IHttpContextAccessor>().HttpContext!;
             return logFactory.CreateLogger(httpContext.Request.Path);
         });
-        builder.Services.Configure<JsonOptions>(config =>
+        builder.Services.ConfigureHttpJsonOptions(config =>
         {
-            config.JsonSerializerOptions.TypeInfoResolverChain.Add(PersonSerializer.Default);
-            config.JsonSerializerOptions.TypeInfoResolverChain.Add(
-                AccountSerializerContext.Default
-            );
-            config.JsonSerializerOptions.TypeInfoResolverChain.Add(
+            config.SerializerOptions.TypeInfoResolverChain.Add(PersonSerializer.Default);
+            config.SerializerOptions.TypeInfoResolverChain.Add(AccountSerializerContext.Default);
+            config.SerializerOptions.TypeInfoResolverChain.Add(
                 AccountRegisterModelSerializerContext.Default
             );
         });

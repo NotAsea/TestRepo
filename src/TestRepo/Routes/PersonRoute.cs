@@ -13,10 +13,10 @@ internal static class PersonRoute
     {
         route.MapGet("/", GetAllPerson).RequireAuthorization();
         route.MapGet("/{id:int}", GetPerson).RequireAuthorization();
-        route.MapPost("/add", CreatePerson).RequireAuthorization();
+        route.MapPost("/", CreatePerson).RequireAuthorization();
         route.MapDelete("/delete", DeleteList).RequireAuthorization();
         route.MapDelete("/delete/{id:int}", DeletePerson).RequireAuthorization();
-        route.MapPatch("/save", UpdatePerson).RequireAuthorization();
+        route.MapPatch("/", UpdatePerson).RequireAuthorization();
         route.MapPut("/active/{id:int}", ActivatePerson).RequireAuthorization();
         route.MapPut("/active", ActivatePeople).RequireAuthorization();
     }
