@@ -1,7 +1,7 @@
 ﻿namespace TestRepo.Service.Services.Providers;
 
 // ReSharper disable once SuggestBaseTypeForParameterInConstructor
-public class PersonService(IRepository repository, MyAppContext context) : IPersonService
+public sealed class PersonService(IRepository repository, MyAppContext context) : IPersonService
 {
     public async Task<ListReturn> GetPeople(
         int index = 1,

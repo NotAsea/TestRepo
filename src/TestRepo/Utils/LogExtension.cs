@@ -41,4 +41,27 @@ public static partial class LogExtension
         [CallerFilePath] string filePath = "",
         [CallerLineNumber] int line = 0
     );
+
+    [LoggerMessage(
+        LogLevel.Error,
+        Message = "Fail while authenticate user, {reason}.\n At {memberName} int {filePath}, line {line}"
+    )]
+    public static partial void AuthenticateFail(
+        this ILogger logger,
+        string reason,
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int line = 0
+    );
+    [LoggerMessage(
+        LogLevel.Error,
+        Message = "Fail while register user, {reason}.\n At {memberName} int {filePath}, line {line}"
+    )]
+    public static partial void RegisterFail(
+        this ILogger logger,
+        string reason,
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int line = 0
+    );
 }

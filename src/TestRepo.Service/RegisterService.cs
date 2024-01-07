@@ -8,6 +8,7 @@ public static class RegisterService
     {
         services.AddRepository(connectionString);
         services.AddScoped<IPersonService, PersonService>();
+        services.AddScoped<IAccountService, AccountService>();
         return services;
     }
 }

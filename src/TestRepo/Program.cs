@@ -10,5 +10,6 @@ var app = builder.Build();
 await app.StartupAction();
 
 app.MapGroup("/person").WithTags("Person").HandlePersonRoute();
+app.MapGroup("/account").WithTags("Account").HandleAccountRoute();
 
 app.Run();

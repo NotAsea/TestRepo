@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Riok.Mapperly.Abstractions;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -40,12 +39,11 @@ public record ListReturn(List<PersonModel> Data, long Count);
 [Mapper]
 internal static partial class PersonModelMapper
 {
-    internal static partial IQueryable<PersonModel> ToModel(this IQueryable<Person> entity);
     internal static partial PersonModel ToModel(this Person entity);
     internal static partial Person ToEntity(this PersonModel model);
 }
 
-internal static partial class CompileRegex
+public static partial class CompileRegex
 {
     [GeneratedRegex(
         @"^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$",

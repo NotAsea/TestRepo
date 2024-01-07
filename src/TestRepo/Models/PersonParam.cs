@@ -2,5 +2,5 @@
 
 namespace TestRepo.Models;
 
-internal record PersonRouteDefaultParam(ILogger Logger, IPersonService Service);
+internal record PersonRouteDefaultParam(ILogger Logger, IPersonService Service, HttpContext HttpContext);
 

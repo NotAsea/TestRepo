@@ -1,6 +1,7 @@
 ﻿// Global using directives
 
 global using Microsoft.Extensions.Logging;
+global using Riok.Mapperly.Abstractions;
 global using TanvirArjel.EFCore.GenericRepository;
 global using TestRepo.Data;
 global using TestRepo.Data.Entities;

@@ -1,26 +1,24 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
-using TestRepo.Models;
-using TestRepo.Service.Models;
 
 namespace TestRepo.Routes;
 
-public static class PersonRoute
+internal static class PersonRoute
 {
     /// <summary>
     /// this consumes the <see cref="RouteGroupBuilder"/> and handle all logic and child route. <br />
     /// This method must be and mean to be called last of <c>Map{Verb}</c> chain, as it return <see cref="Void"/>
     /// </summary>
     /// <param name="route"></param>
-    public static void HandlePersonRoute(this IEndpointRouteBuilder route)
+    internal static void HandlePersonRoute(this IEndpointRouteBuilder route)
     {
-        route.MapGet("/", GetAllPerson);
-        route.MapGet("/{id:int}", GetPerson);
-        route.MapPost("/add", CreatePerson);
-        route.MapDelete("/delete", DeleteList);
-        route.MapDelete("/delete/{id:int}", DeletePerson);
-        route.MapPatch("/save", UpdatePerson);
-        route.MapPut("/active/{id:int}", ActivatePerson);
-        route.MapPut("/active", ActivatePeople);
+        route.MapGet("/", GetAllPerson).RequireAuthorization();
+        route.MapGet("/{id:int}", GetPerson).RequireAuthorization();
+        route.MapPost("/add", CreatePerson).RequireAuthorization();
+        route.MapDelete("/delete", DeleteList).RequireAuthorization();
+        route.MapDelete("/delete/{id:int}", DeletePerson).RequireAuthorization();
+        route.MapPatch("/save", UpdatePerson).RequireAuthorization();
+        route.MapPut("/active/{id:int}", ActivatePerson).RequireAuthorization();
+        route.MapPut("/active", ActivatePeople).RequireAuthorization();
     }
 
     private static async Task<Results<Ok<int>, BadRequest<string>>> CreatePerson(
@@ -28,7 +26,7 @@ public static class PersonRoute
         PersonModel person
     )
     {
-        var (logger, service) = param;
+        var (logger, service, _) = param;
         var msg = person.Verify(true);
         if (!string.IsNullOrEmpty(msg))
             return TypedResults.BadRequest(msg);
@@ -50,7 +48,7 @@ public static class PersonRoute
         bool force = false
     )
     {
-        var (logger, service) = param;
+        var (logger, service, _) = param;
         try
         {
             await service.DeletePerson(id, force);
@@ -69,7 +67,7 @@ public static class PersonRoute
         bool force = false
     )
     {
-        var (logger, service) = param;
+        var (logger, service, _) = param;
         try
         {
             await service.DeletePeople(peopleId, force);
@@ -87,7 +85,7 @@ public static class PersonRoute
         int id
     )
     {
-        var (logger, service) = param;
+        var (logger, service, _) = param;
         try
         {
             var res = await service.GetPerson(id);
@@ -105,7 +103,7 @@ public static class PersonRoute
         [AsParameters] SearchPersonModel search
     )
     {
-        var (logger, service) = param;
+        var (logger, service, _) = param;
         try
         {
             search = search.Verify();
@@ -132,7 +130,7 @@ public static class PersonRoute
         PersonModel person
     )
     {
-        var (logger, service) = param;
+        var (logger, service, _) = param;
         var msg = person.Verify();
         if (!string.IsNullOrEmpty(msg))
             return TypedResults.BadRequest(msg);
@@ -154,7 +152,7 @@ public static class PersonRoute
         int id
     )
     {
-        var (logger, service) = param;
+        var (logger, service, _) = param;
         try
         {
             await service.ActivatePerson(id);
@@ -173,7 +171,7 @@ public static class PersonRoute
         [FromBody] int[] ids
     )
     {
-        var (logger, service) = param;
+        var (logger, service, _) = param;
         try
         {
             await service.ActivatePeople(ids);
