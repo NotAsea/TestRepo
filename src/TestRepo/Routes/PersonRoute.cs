@@ -3,8 +3,8 @@
 internal static class PersonRoute
 {
     /// <summary>
-    /// this consumes the <see cref="RouteGroupBuilder"/> and handle all logic and child route. <br />
-    /// This method must be and mean to be called last of <c>Map{Verb}</c> chain, as it return <see cref="Void"/>
+    ///     this consumes the <see cref="RouteGroupBuilder" /> and handle all logic and child route. <br />
+    ///     This method must be and mean to be called last of <c>Map{Verb}</c> chain, as it return <see cref="Void" />
     /// </summary>
     /// <param name="route"></param>
     internal static void HandlePersonRoute(this IEndpointRouteBuilder route)
@@ -27,7 +27,10 @@ internal static class PersonRoute
         var (logger, service, _) = param;
         var msg = person.Verify(true);
         if (!string.IsNullOrEmpty(msg))
+        {
             return TypedResults.BadRequest(msg);
+        }
+
         try
         {
             return TypedResults.Ok(await service.SavePerson(person));
@@ -131,7 +134,10 @@ internal static class PersonRoute
         var (logger, service, _) = param;
         var msg = person.Verify();
         if (!string.IsNullOrEmpty(msg))
+        {
             return TypedResults.BadRequest(msg);
+        }
+
         try
         {
             await service.SavePerson(person);

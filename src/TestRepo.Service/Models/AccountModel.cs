@@ -10,16 +10,21 @@ public record AccountModel(int Id, string UserName, string Password, int PersonI
     }
 }
 
-
 public static class AccountVerifier
 {
     public static string Verify(this AccountModel model)
     {
         var sb = new StringBuilder();
         if (string.IsNullOrEmpty(model.UserName))
+        {
             sb.Append("Username cannot be null,");
+        }
+
         if (string.IsNullOrEmpty(model.Password))
+        {
             sb.Append("Password cannot be null or empty,");
+        }
+
         return sb.Length > 0 ? sb.ToString().TrimEnd(',') : string.Empty;
     }
 }
@@ -31,7 +36,7 @@ internal static partial class AccountMapper
 {
     [MapperIgnoreTarget(nameof(Account.IsDeleted))]
     internal static partial Account ToEntity(this AccountModel model);
-    
+
     [MapperIgnoreSource(nameof(Account.IsDeleted))]
     internal static partial AccountModel ToModel(this Account account);
 }

@@ -1,4 +1,5 @@
 ﻿using TestRepo.Data.Entities;
+
 // ReSharper disable ReturnTypeCanBeEnumerable.Global
 
 namespace TestRepo.Data;

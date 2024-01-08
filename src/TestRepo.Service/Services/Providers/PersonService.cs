@@ -24,32 +24,37 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
 
         spec.Conditions.Add(
             p =>
-                (
-                    (
-                        string.IsNullOrEmpty(nameSearch)
-                        || p.Name.Contains(nameSearch)
-                        || !string.IsNullOrEmpty(p.Email) && p.Email.Contains(nameSearch)
-                    ) && !p.IsDeleted
-                )
+            (
+                string.IsNullOrEmpty(nameSearch)
+                || p.Name.Contains(nameSearch)
+                || (!string.IsNullOrEmpty(p.Email) && p.Email.Contains(nameSearch))
+            ) && !p.IsDeleted
         );
         spec.Conditions.Add(p => !p.IsDeleted);
         var res = await _repository.GetListAsync(spec, x => x.ToModel());
         return new ListReturn(res.Items, res.TotalItems);
     }
 
-    public Task<PersonModel> GetPerson(int id) =>
-        _repository.GetAsync<Person, PersonModel>(
+    public Task<PersonModel> GetPerson(int id)
+    {
+        return _repository.GetAsync<Person, PersonModel>(
             p => p.Id == id && !p.IsDeleted,
             x => x.ToModel()
         );
+    }
 
     public async Task<int> SavePerson(PersonModel model)
     {
         var entity = model.ToEntity();
         if (entity.Id == 0)
+        {
             await AddToDatabase(entity);
+        }
         else
+        {
             await UpdateToDatabase(entity);
+        }
+
         return entity.Id;
     }
 
@@ -57,10 +62,16 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
     {
         var people = await _repository.GetListAsync<Person>(p => peopleId.Contains(p.Id), true);
         if (people is null or { Count: 0 })
+        {
             throw new Exception("Not found People");
+        }
+
         if (isForce)
+        {
             await RemoveToDatabase(people);
+        }
         else
+        {
             await UpdateToDatabase(
                 people.Select(static p =>
                 {
@@ -68,15 +79,21 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
                     return p;
                 })
             );
+        }
     }
 
     public async Task DeletePerson(int id, bool isForce)
     {
         var person = await _repository.GetAsync<Person>(p => p.Id == id, true);
         if (person is null)
+        {
             throw new Exception("Not found Person");
+        }
+
         if (isForce)
+        {
             await RemoveToDatabase(person);
+        }
         else
         {
             person.IsDeleted = true;
@@ -88,7 +105,9 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
     {
         var person = await _repository.GetByIdAsync<Person>(id);
         if (person is null)
+        {
             throw new Exception("No person found");
+        }
 
         person.IsDeleted = false;
         await UpdateToDatabase(person);
@@ -98,7 +117,10 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
     {
         var people = await _repository.GetListAsync<Person>(p => ids.Contains(p.Id), true);
         if (people is null or { Count: 0 })
+        {
             throw new Exception("No person found");
+        }
+
         await UpdateToDatabase(
             people.Select(static p =>
             {

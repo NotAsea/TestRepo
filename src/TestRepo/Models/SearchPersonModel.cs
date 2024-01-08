@@ -20,7 +20,10 @@ internal static class SearchPersonModelVerifier
                 : "asc";
         var possibleSortBy = new[] { "name", "email", "id", "createddate" };
         if (!string.IsNullOrEmpty(param.SortBy) && !possibleSortBy.Contains(param.SortBy.ToLower()))
+        {
             throw new InvalidDataException("Unknown SortBy");
+        }
+
         return param with
         {
             SortBy = !string.IsNullOrEmpty(param.SortBy) ? param.SortBy.ToUpper() : "Id",

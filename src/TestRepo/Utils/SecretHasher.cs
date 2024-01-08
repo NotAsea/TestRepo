@@ -7,15 +7,17 @@ public static class SecretHasher
     private const int SaltSize = 16; // 128 bits
     private const int KeySize = 32; // 256 bits
     private const int Iterations = 50000;
-    private static readonly HashAlgorithmName Algorithm = HashAlgorithmName.SHA256;
     private const char SegmentDelimiter = ':';
+    private static readonly HashAlgorithmName Algorithm = HashAlgorithmName.SHA256;
 
     /// <summary>
-    /// Hash <paramref name="input"/> using PBKDF2 derived key wih SHA256
+    ///     Hash <paramref name="input" /> using PBKDF2 derived key wih SHA256
     /// </summary>
     /// <param name="input">input string, often password</param>
     /// <returns>hash with embed salt, iteration, hash algorithm in the end</returns>
-    /// <remarks>This function used to have sync version. But typically async nature of ASP.Net core, sync version was remove as we ought to go async anyway.
+    /// <remarks>
+    ///     This function used to have sync version. But typically async nature of ASP.Net core, sync version was remove as we
+    ///     ought to go async anyway.
     /// </remarks>
     public static ValueTask<string> HashAsync(string input)
     {
@@ -33,12 +35,15 @@ public static class SecretHasher
     }
 
     /// <summary>
-    /// Verify <paramref name="input"></paramref> with <paramref name="hashString"/>, this function uses <see cref="CryptographicOperations"/> for fixed time equal to defend time guessing.
+    ///     Verify <paramref name="input"></paramref> with <paramref name="hashString" />, this function uses
+    ///     <see cref="CryptographicOperations" /> for fixed time equal to defend time guessing.
     /// </summary>
     /// <param name="input">often password to verify</param>
-    /// <param name="hashString">an hash password hashed by <see cref="HashAsync"/></param>
+    /// <param name="hashString">an hash password hashed by <see cref="HashAsync" /></param>
     /// <returns>true if equal, false otherwise</returns>
-    /// <remarks>This function used to have sync version. But typically async nature of ASP.Net core, sync version was remove as we ought to go async anyway.
+    /// <remarks>
+    ///     This function used to have sync version. But typically async nature of ASP.Net core, sync version was remove as we
+    ///     ought to go async anyway.
     /// </remarks>
     public static ValueTask<bool> VerifyAsync(string input, string hashString)
     {

@@ -25,11 +25,20 @@ public static class PersonModelVerifier
     {
         var msg = new StringBuilder();
         if (string.IsNullOrEmpty(person.Name))
+        {
             msg.Append("Name cannot be null or Empty,");
+        }
+
         if (!string.IsNullOrEmpty(person.Email) && !CompileRegex.VerifyEmail(person.Email))
+        {
             msg.Append("Wrong format Email,");
+        }
+
         if (!isAdd && person.Id == 0)
+        {
             msg.Append("Id cannot be zero,");
+        }
+
         return msg.Length > 0 ? msg.ToString().TrimEnd(',') : string.Empty;
     }
 }
@@ -51,7 +60,10 @@ public static partial class CompileRegex
     )]
     private static partial Regex EmailRegex();
 
-    public static bool VerifyEmail(string email) => EmailRegex().IsMatch(email);
+    public static bool VerifyEmail(string email)
+    {
+        return EmailRegex().IsMatch(email);
+    }
 }
 
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]

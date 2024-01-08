@@ -44,7 +44,8 @@ public static partial class LogExtension
 
     [LoggerMessage(
         LogLevel.Error,
-        Message = "Fail while authenticate user, {reason}.\n At {memberName} int {filePath}, line {line}. \n {stackTrace}"
+        Message =
+            "Fail while authenticate user, {reason}.\n At {memberName} int {filePath}, line {line}. \n {stackTrace}"
     )]
     public static partial void AuthenticateFail(
         this ILogger logger,

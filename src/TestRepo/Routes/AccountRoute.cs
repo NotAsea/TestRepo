@@ -3,8 +3,8 @@
 internal static class AccountRoute
 {
     /// <summary>
-    /// this consumes the <see cref="RouteGroupBuilder"/> and handle all logic and child route. <br />
-    /// This method must be and mean to be called last of <c>Map{Verb}</c> chain, as it return <see cref="Void"/>
+    ///     this consumes the <see cref="RouteGroupBuilder" /> and handle all logic and child route. <br />
+    ///     This method must be and mean to be called last of <c>Map{Verb}</c> chain, as it return <see cref="Void" />
     /// </summary>
     /// <param name="route"></param>
     internal static void HandleAccountRoute(this IEndpointRouteBuilder route)
@@ -41,7 +41,10 @@ internal static class AccountRoute
         var (logger, service, personService, jwtToken) = param;
         var msg = model.Verify();
         if (!string.IsNullOrEmpty(msg))
+        {
             return TypedResults.BadRequest(msg);
+        }
+
         try
         {
             var account = await service.FindAccount(model.UserName);
@@ -52,7 +55,10 @@ internal static class AccountRoute
                     || !await SecretHasher.VerifyAsync(model.Password, account.Password)
                 )
             )
+            {
                 return TypedResults.BadRequest("wrong Username/ Password");
+            }
+
             var person = await personService.GetPerson(account.PersonId);
             var token = await jwtToken.GetToken(person);
             return TypedResults.Ok(token);
@@ -73,12 +79,18 @@ internal static class AccountRoute
         var (logger, accountService, personService, jwtToken) = param;
         var msg = model.Verify();
         if (!string.IsNullOrEmpty(msg))
+        {
             return TypedResults.BadRequest(msg);
+        }
+
         try
         {
             var exist = await accountService.FindAccount(model.UserName);
             if (exist != null)
+            {
                 return TypedResults.BadRequest("UserName already exist!!");
+            }
+
             var account = model.ToAccount();
             account = account with { Password = await SecretHasher.HashAsync(account.Password) };
             var accountId = await accountService.SaveAccount(account);

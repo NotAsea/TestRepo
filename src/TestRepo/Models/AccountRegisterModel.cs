@@ -17,13 +17,25 @@ public static class AccountRegisterModelVerifier
     {
         var sb = new StringBuilder();
         if (string.IsNullOrEmpty(model.UserName))
+        {
             sb.Append("Username cannot be null,");
+        }
+
         if (string.IsNullOrEmpty(model.Password))
+        {
             sb.Append("Password cannot be null or empty,");
+        }
+
         if (string.IsNullOrEmpty(model.Name))
+        {
             sb.Append("Name cannot be null or Empty,");
+        }
+
         if (!string.IsNullOrEmpty(model.Email) && !CompileRegex.VerifyEmail(model.Email))
+        {
             sb.Append("Wrong format Email,");
+        }
+
         return sb.Length > 0 ? sb.ToString().TrimEnd(',') : string.Empty;
     }
 }

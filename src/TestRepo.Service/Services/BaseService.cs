@@ -2,14 +2,14 @@
 
 // ReSharper disable once SuggestBaseTypeForParameterInConstructor
 /// <summary>
-/// Base service class contain boiler plate code to add, update and remove entity
+///     Base service class contain boiler plate code to add, update and remove entity
 /// </summary>
 /// <param name="repository"></param>
 /// <param name="context"></param>
 internal abstract class BaseService(IRepository repository, MyAppContext context)
 {
     /// <summary>
-    /// Update this entity to Database
+    ///     Update this entity to Database
     /// </summary>
     /// <param name="data"></param>
     /// <typeparam name="T"></typeparam>
@@ -33,7 +33,7 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     }
 
     /// <summary>
-    /// Insert multiple entities to database
+    ///     Insert multiple entities to database
     /// </summary>
     /// <param name="data"></param>
     /// <typeparam name="T"></typeparam>
@@ -55,7 +55,7 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     }
 
     /// <summary>
-    /// Update this entity to database
+    ///     Update this entity to database
     /// </summary>
     /// <param name="data"></param>
     /// <typeparam name="T"></typeparam>
@@ -79,7 +79,7 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     }
 
     /// <summary>
-    /// Update multiple entities to database
+    ///     Update multiple entities to database
     /// </summary>
     /// <param name="data"></param>
     /// <typeparam name="T"></typeparam>
@@ -90,7 +90,7 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
         await using var transaction = await repository.BeginTransactionAsync();
         try
         {
-            await context.BulkInsertAsync(data);
+            await context.BulkUpdateAsync(data);
             await transaction.CommitAsync();
         }
         catch
@@ -101,8 +101,8 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     }
 
     /// <summary>
-    /// <b>Permanent Delete</b> this entity to database.<br/>
-    /// If soft delete is desire, use <see cref="UpdateToDatabase{T}(T)"/> instead
+    ///     <b>Permanent Delete</b> this entity to database.<br />
+    ///     If soft delete is desire, use <see cref="UpdateToDatabase{T}(T)" /> instead
     /// </summary>
     /// <param name="data"></param>
     /// <typeparam name="T"></typeparam>
@@ -126,9 +126,9 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     }
 
     /// <summary>
-    /// <b>Permanent Delete</b> multiple entities to database.<br/>
-    /// If soft delete is desire, use <see cref="UpdateToDatabase{T}(T)"/> instead. <br/>
-    /// <b>Collection expect to be already filter out</b>
+    ///     <b>Permanent Delete</b> multiple entities to database.<br />
+    ///     If soft delete is desire, use <see cref="UpdateToDatabase{T}(T)" /> instead. <br />
+    ///     <b>Collection expect to be already filter out</b>
     /// </summary>
     /// <param name="data"></param>
     /// <typeparam name="T"></typeparam>

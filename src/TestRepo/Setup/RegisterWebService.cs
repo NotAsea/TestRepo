@@ -7,7 +7,7 @@ namespace TestRepo.Setup;
 internal static class SetupWebApp
 {
     /// <summary>
-    /// All App Service should register here to keep main program clean
+    ///     All App Service should register here to keep main program clean
     /// </summary>
     /// <param name="builder"></param>
     internal static void RegisterService(this WebApplicationBuilder builder)
@@ -34,7 +34,8 @@ internal static class SetupWebApp
     }
 
     /// <summary>
-    /// All Startup action like use Middleware, set up Database, check request... should put in here to keep main program clean
+    ///     All Startup action like use Middleware, set up Database, check request... should put in here to keep main program
+    ///     clean
     /// </summary>
     /// <param name="app"></param>
     /// <returns></returns>
@@ -80,7 +81,7 @@ internal static class SetupWebApp
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(
                             configuration["Jwt:Key"]
-                                ?? throw new Exception("Not found Secret key in appsettings.json")
+                            ?? throw new Exception("Not found Secret key in appsettings.json")
                         )
                     ),
                     ValidateIssuer = true,
@@ -98,7 +99,7 @@ internal static class SetupWebApp
         {
             option.AddSecurityDefinition(
                 "Bearer",
-                new OpenApiSecurityScheme()
+                new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
                     Type = SecuritySchemeType.Http,
@@ -107,7 +108,7 @@ internal static class SetupWebApp
                     In = ParameterLocation.Header,
                     Description =
                         // ReSharper disable once StringLiteralTypo
-                        """JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token in the text input below.\r\n\r\nExample: "1safsfsdfdfd" """,
+                        """JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token in the text input below.\r\n\r\nExample: "1safsfsdfdfd" """
                 }
             );
             option.AddSecurityRequirement(
