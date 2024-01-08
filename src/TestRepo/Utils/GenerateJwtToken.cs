@@ -4,24 +4,23 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace TestRepo.Utils;
 
-public static class GenerateJwtToken
+public sealed class GenerateJwtToken(IConfiguration configuration)
 {
-    public static string GetToken(IConfiguration configuration, PersonModel person)
+    public ValueTask<string> GetToken(PersonModel person)
     {
         var issuer = configuration["Jwt:Issuer"];
         var audience = configuration["Jwt:Audience"];
         var key = Encoding.UTF8.GetBytes(
             configuration["Jwt:Key"]
-                ?? throw new Exception("Not found Secret key in appsettings.json")
+            ?? throw new Exception("Not found Secret key in appsettings.json")
         );
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(
-                new[]
-                {
+                [
                     new Claim("Id", person.Id.ToString()),
                     new Claim(JwtRegisteredClaimNames.Name, person.Name)
-                }
+                ]
             ),
             Expires = DateTime.UtcNow.AddDays(7),
             Issuer = issuer,
@@ -33,6 +32,6 @@ public static class GenerateJwtToken
         };
         var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        return ValueTask.FromResult(tokenHandler.WriteToken(token));
     }
 }

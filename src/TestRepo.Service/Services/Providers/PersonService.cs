@@ -1,8 +1,12 @@
 ﻿namespace TestRepo.Service.Services.Providers;
 
 // ReSharper disable once SuggestBaseTypeForParameterInConstructor
-public sealed class PersonService(IRepository repository, MyAppContext context) : IPersonService
+public sealed class PersonService(IRepository repository, MyAppContext context)
+    : BaseService(repository, context),
+        IPersonService
 {
+    private readonly IRepository _repository = repository;
+
     public async Task<ListReturn> GetPeople(
         int index = 1,
         int size = 1000,
@@ -23,41 +27,33 @@ public sealed class PersonService(IRepository repository, MyAppContext context) 
                     p.Name.Contains(nameSearch)
                     || (!string.IsNullOrEmpty(p.Email) && p.Email.Contains(nameSearch))
             );
-        var res = await repository.GetListAsync(spec, x => x.ToModel());
-        return new(res.Items, res.TotalItems);
+        var res = await _repository.GetListAsync(spec, x => x.ToModel());
+        return new ListReturn(res.Items, res.TotalItems);
     }
 
     public Task<PersonModel> GetPerson(int id) =>
-        repository.GetAsync<Person, PersonModel>(p => p.Id == id && !p.IsDeleted, x => x.ToModel());
+        _repository.GetAsync<Person, PersonModel>(
+            p => p.Id == id && !p.IsDeleted,
+            x => x.ToModel()
+        );
 
     public async Task<int> CreatePerson(PersonModel model)
     {
         var entity = model.ToEntity();
-        await using var transaction = await repository.BeginTransactionAsync();
-        try
-        {
-            await repository.AddAsync(entity);
-            await repository.SaveChangesAsync();
-            await transaction.CommitAsync();
-            return entity.Id;
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        await AddToDatabase(entity);
+        return entity.Id;
     }
 
     public async Task DeletePeople(int[] peopleId, bool isForce)
     {
-        var people = await repository.GetListAsync<Person>(p => peopleId.Contains(p.Id), true);
+        var people = await _repository.GetListAsync<Person>(p => peopleId.Contains(p.Id), true);
         if (people is null or { Count: 0 })
             throw new Exception("Not found People");
         if (isForce)
-            await repository.ExecuteDeleteAsync<Person>(p => peopleId.Contains(p.Id));
+            await RemoveToDatabase(people);
         else
-            await context.BulkUpdateAsync(
-                people.Select(p =>
+            await UpdateToDatabase(
+                people.Select(static p =>
                 {
                     p.IsDeleted = true;
                     return p;
@@ -67,75 +63,41 @@ public sealed class PersonService(IRepository repository, MyAppContext context) 
 
     public async Task DeletePerson(int id, bool isForce)
     {
-        var person = await repository.GetAsync<Person>(p => p.Id == id, true);
+        var person = await _repository.GetAsync<Person>(p => p.Id == id, true);
         if (person is null)
             throw new Exception("Not found Person");
         if (isForce)
-            repository.Remove(person);
+            await RemoveToDatabase(person);
         else
         {
             person.IsDeleted = true;
-            repository.Update(person);
-        }
-
-        await using var transaction = await repository.BeginTransactionAsync();
-        try
-        {
-            await repository.SaveChangesAsync();
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
+            await UpdateToDatabase(person);
         }
     }
 
     public async Task UpdatePerson(PersonModel model)
     {
         var person = model.ToEntity();
-        await using var transaction = await repository.BeginTransactionAsync();
-        try
-        {
-            repository.Update(person);
-            await repository.SaveChangesAsync();
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        await UpdateToDatabase(person);
     }
 
     public async Task ActivatePerson(int id)
     {
-        var person = await repository.GetByIdAsync<Person>(id);
+        var person = await _repository.GetByIdAsync<Person>(id);
         if (person is null)
             throw new Exception("No person found");
 
         person.IsDeleted = false;
-        await using var transaction = await repository.BeginTransactionAsync();
-        try
-        {
-            repository.Update(person);
-            await repository.SaveChangesAsync();
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        await UpdateToDatabase(person);
     }
 
     public async Task ActivatePeople(int[] ids)
     {
-        var people = await repository.GetListAsync<Person>(p => ids.Contains(p.Id), true);
+        var people = await _repository.GetListAsync<Person>(p => ids.Contains(p.Id), true);
         if (people is null or { Count: 0 })
             throw new Exception("No person found");
-        await context.BulkUpdateAsync(
-            people.Select(p =>
+        await UpdateToDatabase(
+            people.Select(static p =>
             {
                 p.IsDeleted = false;
                 return p;

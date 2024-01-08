@@ -31,8 +31,18 @@ public static class AccountRegisterModelVerifier
 [Mapper]
 public static partial class AccountRegisterModelMapper
 {
+    [MapperIgnoreTarget(nameof(AccountModel.PersonId))]
+    [MapperIgnoreTarget(nameof(AccountModel.Id))]
+    [MapperIgnoreSource(nameof(AccountRegisterModel.Email))]
+    [MapperIgnoreSource(nameof(AccountRegisterModel.Description))]
+    [MapperIgnoreSource(nameof(AccountRegisterModel.Name))]
     public static partial AccountModel ToAccount(this AccountRegisterModel model);
 
+    [MapperIgnoreSource(nameof(AccountRegisterModel.Password))]
+    [MapperIgnoreSource(nameof(AccountRegisterModel.UserName))]
+    [MapperIgnoreTarget(nameof(PersonModel.Id))]
+    [MapperIgnoreTarget(nameof(PersonModel.CreatedDate))]
+    [MapperIgnoreTarget(nameof(PersonModel.IsDeleted))]
     public static partial PersonModel ToPerson(this AccountRegisterModel model);
 }
 

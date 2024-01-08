@@ -10,6 +10,7 @@ public record AccountModel(int Id, string UserName, string Password, int PersonI
     }
 }
 
+
 public static class AccountVerifier
 {
     public static string Verify(this AccountModel model)

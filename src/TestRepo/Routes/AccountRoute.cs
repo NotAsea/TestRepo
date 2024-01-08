@@ -14,14 +14,25 @@ internal static class AccountRoute
         route.MapPost("/", Login).AllowAnonymous();
         route.MapGet("/{id:int}", GetAccounts);
         route.MapPost("/register", Register).AllowAnonymous();
+        route.MapDelete("/{id:int}", DeleteAccount);
     }
 
-    private static Task<Results<Ok<int>, BadRequest<string>>> GetAccounts(
+    private static async Task<Results<Ok<AccountModel>, BadRequest<string>>> GetAccounts(
         [AsParameters] AccountServiceParam param,
         int id
     )
     {
-        throw new NotImplementedException();
+        var (logger, accountService, _, _) = param;
+        try
+        {
+            return TypedResults.Ok(await accountService.GetAccount(id));
+        }
+        catch (Exception ex)
+        {
+            var reason = ex.GetBaseException().Message;
+            logger.ReadFromDatabaseFail("Account", reason);
+            return TypedResults.BadRequest(reason);
+        }
     }
 
     private static async Task<Results<Ok<string>, BadRequest<string>>> Login(
@@ -29,19 +40,24 @@ internal static class AccountRoute
         AccountModel model
     )
     {
-        var (logger, service, personService, configuration) = param;
+        var (logger, service, personService, jwtToken) = param;
         var msg = model.Verify();
         if (!string.IsNullOrEmpty(msg))
             return TypedResults.BadRequest(msg);
         try
         {
             var account = await service.FindAccount(model.UserName);
-            if (account?.UserName != "Noah123" &&
-                (account is null || !await SecretHasher.VerifyAsync(model.Password, account.Password)))
+            if (
+                account?.UserName != "Noah123"
+                && (
+                    account is null
+                    || !await SecretHasher.VerifyAsync(model.Password, account.Password)
+                )
+            )
                 return TypedResults.BadRequest("wrong Username/ Password");
             var person = await personService.GetPerson(account.PersonId);
-            var jwtToken = GenerateJwtToken.GetToken(configuration, person);
-            return TypedResults.Ok(jwtToken);
+            var token = await jwtToken.GetToken(person);
+            return TypedResults.Ok(token);
         }
         catch (Exception ex)
         {
@@ -56,23 +72,49 @@ internal static class AccountRoute
         AccountRegisterModel model
     )
     {
-        var (logger, accountService, personService, configuration) = param;
+        var (logger, accountService, personService, jwtToken) = param;
         var msg = model.Verify();
         if (!string.IsNullOrEmpty(msg))
             return TypedResults.BadRequest(msg);
         try
         {
             var exist = await accountService.FindAccount(model.UserName);
-            if (exist != null) return TypedResults.BadRequest("UserName already exist!!");
+            if (exist != null)
+                return TypedResults.BadRequest("UserName already exist!!");
             var account = model.ToAccount();
             account = account with { Password = await SecretHasher.HashAsync(account.Password) };
-
-            return TypedResults.Ok(1.ToString());
+            var accountId = await accountService.SaveAccount(account);
+            var person = model.ToPerson();
+            var id = await personService.CreatePerson(person);
+            person = person with { Id = id };
+            account = account with { PersonId = id, Id = accountId };
+            await accountService.SaveAccount(account);
+            var token = await jwtToken.GetToken(person);
+            return TypedResults.Ok(token);
         }
         catch (Exception ex)
         {
             var reason = ex.GetBaseException().Message;
             logger.RegisterFail(reason);
+            return TypedResults.BadRequest(reason);
+        }
+    }
+
+    private static async Task<Results<Ok<int>, BadRequest<string>>> DeleteAccount(
+        [AsParameters] AccountServiceParam param,
+        int id,
+        bool isForce
+    )
+    {
+        var (logger, accountService, _, _) = param;
+        try
+        {
+            return TypedResults.Ok(await accountService.DeleteAccount(id, isForce));
+        }
+        catch (Exception ex)
+        {
+            var reason = ex.GetBaseException().Message;
+            logger.WriteToDatabaseFail("Account", reason);
             return TypedResults.BadRequest(reason);
         }
     }

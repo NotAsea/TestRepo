@@ -22,6 +22,7 @@ internal static class SetupWebApp
             var httpContext = p.GetRequiredService<IHttpContextAccessor>().HttpContext!;
             return logFactory.CreateLogger(httpContext.Request.Path);
         });
+        builder.Services.AddScoped<GenerateJwtToken>();
         builder.Services.ConfigureHttpJsonOptions(config =>
         {
             config.SerializerOptions.TypeInfoResolverChain.Add(PersonSerializer.Default);
@@ -100,13 +101,13 @@ internal static class SetupWebApp
                 new OpenApiSecurityScheme()
                 {
                     Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
+                    Type = SecuritySchemeType.Http,
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
                     Description =
                         // ReSharper disable once StringLiteralTypo
-                        "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1safsfsdfdfd\"",
+                        """JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token in the text input below.\r\n\r\nExample: "1safsfsdfdfd" """,
                 }
             );
             option.AddSecurityRequirement(

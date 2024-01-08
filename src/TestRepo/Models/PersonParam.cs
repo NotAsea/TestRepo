@@ -1,6 +1,9 @@
-﻿// ReSharper disable ClassNeverInstantiated.Global
+﻿namespace TestRepo.Models;
 
-namespace TestRepo.Models;
-
-internal record PersonRouteDefaultParam(ILogger Logger, IPersonService Service, HttpContext HttpContext);
-
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable once NotAccessedPositionalProperty.Global
+internal record PersonRouteDefaultParam(
+    ILogger Logger,
+    IPersonService Service,
+    HttpContext HttpContext
+);
