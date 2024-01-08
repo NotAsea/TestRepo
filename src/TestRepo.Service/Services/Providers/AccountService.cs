@@ -1,6 +1,6 @@
 ﻿namespace TestRepo.Service.Services.Providers;
 
-public sealed class AccountService(IRepository repository, MyAppContext context)
+internal sealed class AccountService(IRepository repository, MyAppContext context)
     : BaseService(repository, context),
         IAccountService
 {
@@ -21,7 +21,10 @@ public sealed class AccountService(IRepository repository, MyAppContext context)
     public async Task<int> SaveAccount(AccountModel model)
     {
         var entity = model.ToEntity();
-        await AddToDatabase(entity);
+        if (entity.Id == 0)
+            await AddToDatabase(entity);
+        else
+            await UpdateToDatabase(entity);
         return entity.Id;
     }
 

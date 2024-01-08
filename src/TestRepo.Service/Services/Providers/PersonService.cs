@@ -1,7 +1,7 @@
 ﻿namespace TestRepo.Service.Services.Providers;
 
 // ReSharper disable once SuggestBaseTypeForParameterInConstructor
-public sealed class PersonService(IRepository repository, MyAppContext context)
+internal sealed class PersonService(IRepository repository, MyAppContext context)
     : BaseService(repository, context),
         IPersonService
 {
@@ -21,12 +21,18 @@ public sealed class PersonService(IRepository repository, MyAppContext context)
             PageSize = size,
             OrderByDynamic = (sortBy, sortType)
         };
-        if (!string.IsNullOrEmpty(nameSearch))
-            spec.Conditions.Add(
-                p =>
-                    p.Name.Contains(nameSearch)
-                    || (!string.IsNullOrEmpty(p.Email) && p.Email.Contains(nameSearch))
-            );
+
+        spec.Conditions.Add(
+            p =>
+                (
+                    (
+                        string.IsNullOrEmpty(nameSearch)
+                        || p.Name.Contains(nameSearch)
+                        || !string.IsNullOrEmpty(p.Email) && p.Email.Contains(nameSearch)
+                    ) && !p.IsDeleted
+                )
+        );
+        spec.Conditions.Add(p => !p.IsDeleted);
         var res = await _repository.GetListAsync(spec, x => x.ToModel());
         return new ListReturn(res.Items, res.TotalItems);
     }
@@ -37,10 +43,13 @@ public sealed class PersonService(IRepository repository, MyAppContext context)
             x => x.ToModel()
         );
 
-    public async Task<int> CreatePerson(PersonModel model)
+    public async Task<int> SavePerson(PersonModel model)
     {
         var entity = model.ToEntity();
-        await AddToDatabase(entity);
+        if (entity.Id == 0)
+            await AddToDatabase(entity);
+        else
+            await UpdateToDatabase(entity);
         return entity.Id;
     }
 
@@ -73,12 +82,6 @@ public sealed class PersonService(IRepository repository, MyAppContext context)
             person.IsDeleted = true;
             await UpdateToDatabase(person);
         }
-    }
-
-    public async Task UpdatePerson(PersonModel model)
-    {
-        var person = model.ToEntity();
-        await UpdateToDatabase(person);
     }
 
     public async Task ActivatePerson(int id)

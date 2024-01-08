@@ -11,10 +11,9 @@ public interface IPersonService
     );
 
     Task<PersonModel> GetPerson(int id);
-    Task<int> CreatePerson(PersonModel model);
+    Task<int> SavePerson(PersonModel model);
     Task DeletePeople(int[] peopleId, bool isForce);
     Task DeletePerson(int id, bool isForce);
-    Task UpdatePerson(PersonModel model);
     Task ActivatePerson(int id);
     Task ActivatePeople(int[] id);
 }

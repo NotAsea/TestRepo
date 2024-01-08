@@ -1,4 +1,4 @@
-﻿namespace TestRepo.Service;
+﻿namespace TestRepo.Service.Services;
 
 // ReSharper disable once SuggestBaseTypeForParameterInConstructor
 /// <summary>
@@ -6,7 +6,7 @@
 /// </summary>
 /// <param name="repository"></param>
 /// <param name="context"></param>
-public abstract class BaseService(IRepository repository, MyAppContext context)
+internal abstract class BaseService(IRepository repository, MyAppContext context)
 {
     /// <summary>
     /// Update this entity to Database

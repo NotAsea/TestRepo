@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-
-namespace TestRepo.Routes;
+﻿namespace TestRepo.Routes;
 
 internal static class AccountRoute
 {
@@ -85,7 +83,7 @@ internal static class AccountRoute
             account = account with { Password = await SecretHasher.HashAsync(account.Password) };
             var accountId = await accountService.SaveAccount(account);
             var person = model.ToPerson();
-            var id = await personService.CreatePerson(person);
+            var id = await personService.SavePerson(person);
             person = person with { Id = id };
             account = account with { PersonId = id, Id = accountId };
             await accountService.SaveAccount(account);

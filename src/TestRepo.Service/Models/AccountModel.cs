@@ -29,8 +29,10 @@ public record ListAccount(List<AccountModel> Data, long Count);
 [Mapper]
 internal static partial class AccountMapper
 {
+    [MapperIgnoreTarget(nameof(Account.IsDeleted))]
     internal static partial Account ToEntity(this AccountModel model);
-
+    
+    [MapperIgnoreSource(nameof(Account.IsDeleted))]
     internal static partial AccountModel ToModel(this Account account);
 }
 

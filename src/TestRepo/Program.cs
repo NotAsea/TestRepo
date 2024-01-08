@@ -11,5 +11,6 @@ await app.StartupAction();
 
 app.MapGroup("/person").WithTags("Person").HandlePersonRoute();
 app.MapGroup("/account").WithTags("Account").HandleAccountRoute();
+app.MapGroup("/dad-joke").WithTags("DadJoke").HandleDadJokeRoute();
 
 app.Run();

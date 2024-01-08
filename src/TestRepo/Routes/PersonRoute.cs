@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-
-namespace TestRepo.Routes;
+﻿namespace TestRepo.Routes;
 
 internal static class PersonRoute
 {
@@ -32,7 +30,7 @@ internal static class PersonRoute
             return TypedResults.BadRequest(msg);
         try
         {
-            return TypedResults.Ok(await service.CreatePerson(person));
+            return TypedResults.Ok(await service.SavePerson(person));
         }
         catch (Exception ex)
         {
@@ -136,7 +134,7 @@ internal static class PersonRoute
             return TypedResults.BadRequest(msg);
         try
         {
-            await service.UpdatePerson(person);
+            await service.SavePerson(person);
             return TypedResults.Ok(person.Id);
         }
         catch (Exception ex)

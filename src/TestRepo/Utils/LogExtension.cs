@@ -54,6 +54,7 @@ public static partial class LogExtension
         [CallerFilePath] string filePath = "",
         [CallerLineNumber] int line = 0
     );
+
     [LoggerMessage(
         LogLevel.Error,
         Message = "Fail while register user, {reason}.\n At {memberName} int {filePath}, line {line}"
@@ -61,6 +62,19 @@ public static partial class LogExtension
     public static partial void RegisterFail(
         this ILogger logger,
         string reason,
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int line = 0
+    );
+
+    [LoggerMessage(
+        LogLevel.Error,
+        Message = "Fail while calling api, {reason}.\n At {memberName} int {filePath}, line {line}. \n {stackTrace}"
+    )]
+    public static partial void CallApiFail(
+        this ILogger logger,
+        string reason,
+        string stackTrace,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string filePath = "",
         [CallerLineNumber] int line = 0

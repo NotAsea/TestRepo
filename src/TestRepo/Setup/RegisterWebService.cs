@@ -15,7 +15,7 @@ internal static class SetupWebApp
         builder.Services.AddEndpointsApiExplorer().AddHttpContextAccessor();
         builder.Services.AddAppAuthentication(builder.Configuration);
         builder.Services.AddSwaggerGen();
-        builder.Services.AddService(builder.Configuration.GetConnectionString("default")!);
+        builder.Services.AddService(builder.Configuration);
         builder.Services.AddTransient(p =>
         {
             var logFactory = p.GetRequiredService<ILoggerFactory>();
