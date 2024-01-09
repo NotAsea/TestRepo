@@ -58,6 +58,8 @@ public static class StartupAction
         }
 
         var path = folder + @"\account.csv";
+        if (File.Exists(path))
+            File.Delete(path);
         await using var file = File.OpenWrite(path);
         await using var writer = new StreamWriter(file);
         await writer.WriteLineAsync($"{nameof(Account.UserName)},{nameof(Account.Password)}");
