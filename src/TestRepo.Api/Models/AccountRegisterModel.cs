@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Riok.Mapperly.Abstractions;
 
-namespace TestRepo.Models;
+namespace TestRepo.Api.Models;
 
 public record AccountRegisterModel(
     string UserName,

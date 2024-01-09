@@ -1,5 +1,4 @@
-using TestRepo.Routes;
-using TestRepo.Setup;
+using TestRepo.Api.Routes;
 
 var builder = WebApplication.CreateBuilder(args);
 

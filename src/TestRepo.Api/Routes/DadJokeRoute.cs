@@ -1,6 +1,6 @@
-﻿namespace TestRepo.Routes;
+﻿namespace TestRepo.Api.Routes;
 
-public static class DadJokeRoute
+public static class DadJokeRoute 
 {
     public static void HandleDadJokeRoute(this IEndpointRouteBuilder route)
     {

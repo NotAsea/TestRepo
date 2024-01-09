@@ -1,6 +1,6 @@
-﻿using TestRepo.Util;
+﻿using AccountRegisterModelSerializerContext = TestRepo.Api.Models.AccountRegisterModelSerializerContext;
 
-namespace TestRepo.Setup;
+namespace TestRepo.Api.Setup;
 
 internal static class SetupWebApp
 {

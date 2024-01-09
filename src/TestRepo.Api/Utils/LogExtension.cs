@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace TestRepo.Utils;
+namespace TestRepo.Api.Utils;
 
 public static partial class LogExtension
 {

@@ -1,6 +1,4 @@
-﻿using TestRepo.Util;
-
-namespace TestRepo.Routes;
+﻿namespace TestRepo.Api.Routes;
 
 internal static class AccountRoute
 {

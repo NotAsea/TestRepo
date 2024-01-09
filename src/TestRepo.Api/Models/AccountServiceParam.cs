@@ -1,6 +1,4 @@
-﻿using TestRepo.Util;
-
-namespace TestRepo.Models;
+﻿namespace TestRepo.Api.Models;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public record AccountServiceParam(
