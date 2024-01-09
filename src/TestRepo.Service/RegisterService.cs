@@ -1,5 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Bogus;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TestRepo.Util;
+using Person = TestRepo.Data.Entities.Person;
 
 namespace TestRepo.Service;
 
@@ -35,9 +38,51 @@ public static class StartupAction
         var repository = provider.GetRequiredService<IRepository>();
         var context = provider.GetRequiredService<MyAppContext>();
         await context.Database.EnsureCreatedAsync();
+
         if (!await repository.ExistsAsync<Person>())
         {
-            await context.BulkInsertAsync(SeedData.GetPeople());
+            await context.BulkInsertAsync(SeedData.GetPeople()).ConfigureAwait(false);
         }
+
+        if (await repository.ExistsAsync<Account>())
+        {
+            return;
+        }
+
+        var accounts = SeedData.GetAcc();
+        var folder =
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\TestRepo";
+        if (!Directory.Exists(folder))
+        {
+            Directory.CreateDirectory(folder);
+        }
+
+        await using var file = File.OpenWrite(folder + @"\account.csv");
+        await using var writer = new StreamWriter(file);
+        await writer.WriteLineAsync(
+            $"{nameof(Account.UserName)},{nameof(Account.Password)}"
+        );
+        foreach (var acc in accounts)
+        {
+            await writer.WriteLineAsync($"{acc.UserName},{acc.Password}");
+        }
+
+        var newAccounts = accounts.Select(a =>
+        {
+            a.Password = SecretHasher.Hash(a.Password);
+            return a;
+        });
+        if (await repository.ExistsAsync<Person>())
+        {
+            var peopleId = await repository.GetListAsync<Person, int>(p => p.Id);
+            var faker = new Faker();
+            newAccounts = newAccounts.Select(a =>
+            {
+                a.PersonId = faker.PickRandom(peopleId);
+                return a;
+            });
+        }
+
+        await context.BulkInsertAsync(newAccounts).ConfigureAwait(false);
     }
 }

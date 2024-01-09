@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+﻿using TestRepo.Util;
 
 namespace TestRepo.Setup;
 
@@ -14,7 +12,7 @@ internal static class SetupWebApp
     {
         builder.Services.AddEndpointsApiExplorer().AddHttpContextAccessor();
         builder.Services.AddAppAuthentication(builder.Configuration);
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwagger();
         builder.Services.AddService(builder.Configuration);
         builder.Services.AddTransient(p =>
         {
@@ -22,7 +20,6 @@ internal static class SetupWebApp
             var httpContext = p.GetRequiredService<IHttpContextAccessor>().HttpContext!;
             return logFactory.CreateLogger(httpContext.Request.Path);
         });
-        builder.Services.AddScoped<GenerateJwtToken>();
         builder.Services.ConfigureHttpJsonOptions(config =>
         {
             config.SerializerOptions.TypeInfoResolverChain.Add(PersonSerializer.Default);
@@ -58,75 +55,5 @@ internal static class SetupWebApp
         {
             app.Logger.InitializeDatabaseFail(ex.GetBaseException().Message);
         }
-    }
-
-    private static void AddAppAuthentication(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
-    {
-        services
-            .AddAuthentication(opt =>
-            {
-                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(opt =>
-            {
-                opt.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidIssuer = configuration["Jwt:Issuer"],
-                    ValidAudience = configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(
-                            configuration["Jwt:Key"]
-                            ?? throw new Exception("Not found Secret key in appsettings.json")
-                        )
-                    ),
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = false,
-                    ValidateIssuerSigningKey = true
-                };
-            });
-        services.AddAuthorization();
-    }
-
-    private static void AddSwaggerGen(this IServiceCollection services)
-    {
-        services.AddSwaggerGen(option =>
-        {
-            option.AddSecurityDefinition(
-                "Bearer",
-                new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Description =
-                        // ReSharper disable once StringLiteralTypo
-                        """JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token in the text input below.\r\n\r\nExample: "1safsfsdfdfd" """
-                }
-            );
-            option.AddSecurityRequirement(
-                new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
-                    }
-                }
-            );
-        });
     }
 }

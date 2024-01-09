@@ -1,4 +1,6 @@
-﻿namespace TestRepo.Service.Services;
+﻿using static TestRepo.Data.QueryTransactionStatic;
+
+namespace TestRepo.Service.Services;
 
 // ReSharper disable once SuggestBaseTypeForParameterInConstructor
 /// <summary>
@@ -17,19 +19,16 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     protected async Task AddToDatabase<T>(T data)
         where T : class
     {
-        await using var transaction = await repository.BeginTransactionAsync();
-        try
-        {
-            await repository.AddAsync(data);
-            await repository.SaveChangesAsync();
-            await transaction.CommitAsync();
-            repository.ClearChangeTracker();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        await QueryInTransactionScope(
+            static async (repo, d) =>
+            {
+                await repo.AddAsync(d);
+                await repo.SaveChangesAsync();
+            },
+            data,
+            repository,
+            true
+        );
     }
 
     /// <summary>
@@ -41,17 +40,11 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     protected async Task AddToDatabase<T>(IEnumerable<T> data)
         where T : class
     {
-        await using var transaction = await repository.BeginTransactionAsync();
-        try
-        {
-            await context.BulkInsertAsync(data);
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        await QueryInTransactionScope(
+            static async (ctx, d) => await ctx.BulkInsertAsync(d),
+            data,
+            context
+        );
     }
 
     /// <summary>
@@ -63,19 +56,16 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     protected async Task UpdateToDatabase<T>(T data)
         where T : class
     {
-        await using var transaction = await repository.BeginTransactionAsync();
-        try
-        {
-            repository.Update(data);
-            await repository.SaveChangesAsync();
-            await transaction.CommitAsync();
-            repository.ClearChangeTracker();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        await QueryInTransactionScope(
+            static async (repo, d) =>
+            {
+                repo.Update(d);
+                await repo.SaveChangesAsync();
+            },
+            data,
+            repository,
+            true
+        );
     }
 
     /// <summary>
@@ -87,17 +77,11 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     protected async Task UpdateToDatabase<T>(IEnumerable<T> data)
         where T : class
     {
-        await using var transaction = await repository.BeginTransactionAsync();
-        try
-        {
-            await context.BulkUpdateAsync(data);
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        await QueryInTransactionScope(
+            static async (ctx, d) => await ctx.BulkUpdateAsync(d),
+            data,
+            context
+        );
     }
 
     /// <summary>
@@ -110,19 +94,16 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     protected async Task RemoveToDatabase<T>(T data)
         where T : class
     {
-        await using var transaction = await repository.BeginTransactionAsync();
-        try
-        {
-            repository.Remove(data);
-            await repository.SaveChangesAsync();
-            await transaction.CommitAsync();
-            repository.ClearChangeTracker();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        await QueryInTransactionScope(
+            static async (repo, d) =>
+            {
+                repo.Remove(d);
+                await repo.SaveChangesAsync();
+            },
+            data,
+            repository,
+            false
+        );
     }
 
     /// <summary>
@@ -136,16 +117,10 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     protected async Task RemoveToDatabase<T>(IEnumerable<T> data)
         where T : class
     {
-        await using var transaction = await repository.BeginTransactionAsync();
-        try
-        {
-            await context.BulkDeleteAsync(data);
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        await QueryInTransactionScope(
+            static async (ctx, d) => await ctx.BulkDeleteAsync(d),
+            data,
+            context
+        );
     }
 }

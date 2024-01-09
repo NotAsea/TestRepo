@@ -1,12 +1,14 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace TestRepo.Utils;
+namespace TestRepo.Util;
 
 public sealed class GenerateJwtToken(IConfiguration configuration)
 {
-    public ValueTask<string> GetToken(PersonModel person)
+    public ValueTask<string> GetToken(int personId, string personName)
     {
         var issuer = configuration["Jwt:Issuer"];
         var audience = configuration["Jwt:Audience"];
@@ -18,8 +20,8 @@ public sealed class GenerateJwtToken(IConfiguration configuration)
         {
             Subject = new ClaimsIdentity(
                 [
-                    new Claim("Id", person.Id.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Name, person.Name)
+                    new Claim("Id", personId.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Name, personName)
                 ]
             ),
             Expires = DateTime.UtcNow.AddDays(7),

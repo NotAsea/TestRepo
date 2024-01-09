@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace TestRepo.Utils;
+namespace TestRepo.Util;
 
 public static class SecretHasher
 {
@@ -15,22 +15,26 @@ public static class SecretHasher
     /// </summary>
     /// <param name="input">input string, often password</param>
     /// <returns>hash with embed salt, iteration, hash algorithm in the end</returns>
-    /// <remarks>
-    ///     This function used to have sync version. But typically async nature of ASP.Net core, sync version was remove as we
-    ///     ought to go async anyway.
-    /// </remarks>
     public static ValueTask<string> HashAsync(string input)
+    {
+        return ValueTask.FromResult(Hash(input));
+    }
+
+    /// <summary>
+    ///     Hash <paramref name="input" /> using PBKDF2 derived key wih SHA256
+    /// </summary>
+    /// <param name="input">input string, often password</param>
+    /// <returns>hash with embed salt, iteration, hash algorithm in the end</returns>
+    public static string Hash(string input)
     {
         var salt = RandomNumberGenerator.GetBytes(SaltSize);
         var hash = Rfc2898DeriveBytes.Pbkdf2(input, salt, Iterations, Algorithm, KeySize);
-        return ValueTask.FromResult(
-            string.Join(
-                SegmentDelimiter,
-                Convert.ToHexString(hash),
-                Convert.ToHexString(salt),
-                Iterations,
-                Algorithm
-            )
+        return string.Join(
+            SegmentDelimiter,
+            Convert.ToHexString(hash),
+            Convert.ToHexString(salt),
+            Iterations,
+            Algorithm
         );
     }
 
