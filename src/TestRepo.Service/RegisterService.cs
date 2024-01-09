@@ -8,10 +8,7 @@ namespace TestRepo.Service;
 
 public static class RegisterService
 {
-    public static IServiceCollection AddService(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
+    public static void AddService(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddRepository(configuration.GetConnectionString("default")!);
         services.AddScoped<IPersonService, PersonService>();
@@ -27,7 +24,6 @@ public static class RegisterService
                 () => new SocketsHttpHandler { PooledConnectionLifetime = TimeSpan.FromMinutes(2) }
             )
             .SetHandlerLifetime(Timeout.InfiniteTimeSpan);
-        return services;
     }
 }
 

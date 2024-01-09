@@ -4,7 +4,7 @@ namespace TestRepo.Service.Services;
 
 // ReSharper disable once SuggestBaseTypeForParameterInConstructor
 /// <summary>
-///     Base service class contain boiler plate code to add, update and remove entity
+///     Base service class contain boilerplate code to add, update and remove entity
 /// </summary>
 /// <param name="repository"></param>
 /// <param name="context"></param>
