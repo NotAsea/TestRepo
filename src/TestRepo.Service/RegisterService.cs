@@ -57,11 +57,10 @@ public static class StartupAction
             Directory.CreateDirectory(folder);
         }
 
-        await using var file = File.OpenWrite(folder + @"\account.csv");
+        var path = folder + @"\account.csv";
+        await using var file = File.OpenWrite(path);
         await using var writer = new StreamWriter(file);
-        await writer.WriteLineAsync(
-            $"{nameof(Account.UserName)},{nameof(Account.Password)}"
-        );
+        await writer.WriteLineAsync($"{nameof(Account.UserName)},{nameof(Account.Password)}");
         foreach (var acc in accounts)
         {
             await writer.WriteLineAsync($"{acc.UserName},{acc.Password}");
@@ -84,5 +83,6 @@ public static class StartupAction
         }
 
         await context.BulkInsertAsync(newAccounts).ConfigureAwait(false);
+        Console.WriteLine("Generated Account got wrote in {0}", path);
     }
 }
