@@ -7,14 +7,7 @@ internal sealed class GetDadJokeService(HttpClient httpClient) : IGetDadJokeServ
 {
     public Task<DadJokeModel?> GetDadJoke(string? id)
     {
-        httpClient.DefaultRequestHeaders.Clear();
-        httpClient.DefaultRequestHeaders.Add(
-            "User-Agent",
-            "My Library (https://github.com/NotAsea/TestRepo.git)"
-        );
-        httpClient.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json")
-        );
+        SetHeader(httpClient, "application/json");
         return httpClient.GetFromJsonAsync(
             string.IsNullOrEmpty(id) ? "/" : $"/j/{id}",
             DadJokeSerializerContext.Default.DadJokeModel
@@ -23,27 +16,13 @@ internal sealed class GetDadJokeService(HttpClient httpClient) : IGetDadJokeServ
 
     public Task<string> GetDadJokeAsString(string? id)
     {
-        httpClient.DefaultRequestHeaders.Clear();
-        httpClient.DefaultRequestHeaders.Add(
-            "User-Agent",
-            "My Library (https://github.com/NotAsea/TestRepo.git)"
-        );
-        httpClient.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("text/plain")
-        );
+        SetHeader(httpClient, "text/plain");
         return httpClient.GetStringAsync(string.IsNullOrEmpty(id) ? "/" : $"/j/{id}");
     }
 
     public Task<DadJokeModelList?> SearchDadJoke(int? page, int? limit, string? term)
     {
-        httpClient.DefaultRequestHeaders.Clear();
-        httpClient.DefaultRequestHeaders.Add(
-            "User-Agent",
-            "My Library (https://github.com/NotAsea/TestRepo.git)"
-        );
-        httpClient.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json")
-        );
+        SetHeader(httpClient, "application/json");
         return httpClient.GetFromJsonAsync(
             $"/search?page={page}&limit={limit}&term={term}",
             DadJokeSerializerContext.Default.DadJokeModelList
@@ -52,14 +31,19 @@ internal sealed class GetDadJokeService(HttpClient httpClient) : IGetDadJokeServ
 
     public Task<string> SearchDadJokeAsString(int? page, int? limit, string? term)
     {
-        httpClient.DefaultRequestHeaders.Clear();
-        httpClient.DefaultRequestHeaders.Add(
+        SetHeader(httpClient, "text/plain");
+        return httpClient.GetStringAsync($"/search?page={page}&limit={limit}&term={term}");
+    }
+
+    private static void SetHeader(HttpClient client, string mediaQueryType)
+    {
+        client.DefaultRequestHeaders.Clear();
+        client.DefaultRequestHeaders.Add(
             "User-Agent",
             "My Library (https://github.com/NotAsea/TestRepo.git)"
         );
-        httpClient.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("text/plain")
+        client.DefaultRequestHeaders.Accept.Add(
+            new MediaTypeWithQualityHeaderValue(mediaQueryType)
         );
-        return httpClient.GetStringAsync($"/search?page={page}&limit={limit}&term={term}");
     }
 }
