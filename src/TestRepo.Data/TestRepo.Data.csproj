@@ -17,4 +17,8 @@
         <None Include="D:\C#\TestRepo\TestRepo.Data\Migrations\.editorconfig"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\TestRepo.Util\TestRepo.Util.csproj" />
+    </ItemGroup>
+
 </Project>

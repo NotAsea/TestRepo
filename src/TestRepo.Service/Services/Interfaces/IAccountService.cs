@@ -3,6 +3,7 @@
 public interface IAccountService
 {
     Task<AccountModel> GetAccount(int id);
+    Task<PersonAccount?> GetFromPersonId(int id);
     Task<AccountModel?> FindAccount(string username);
     Task<int> SaveAccount(AccountModel model);
 

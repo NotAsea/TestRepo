@@ -1,4 +1,4 @@
-﻿using AccountRegisterModelSerializerContext = TestRepo.Api.Models.AccountRegisterModelSerializerContext;
+﻿using AccountRegisterModelSerializerContext = TestRepo.Api.Models.AccountModels.AccountRegisterModelSerializerContext;
 
 namespace TestRepo.Api.Setup;
 
@@ -27,6 +27,7 @@ internal static class SetupWebApp
             config.SerializerOptions.TypeInfoResolverChain.Add(
                 AccountRegisterModelSerializerContext.Default
             );
+            config.SerializerOptions.TypeInfoResolverChain.Add(PersonAccountSerializerContext.Default);
         });
     }
 

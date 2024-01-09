@@ -35,13 +35,11 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
         return new ListReturn(res.Items, res.TotalItems);
     }
 
-    public Task<PersonModel> GetPerson(int id)
-    {
-        return _repository.GetAsync<Person, PersonModel>(
+    public Task<PersonModel> GetPerson(int id) =>
+        _repository.GetAsync<Person, PersonModel>(
             p => p.Id == id && !p.IsDeleted,
             x => x.ToModel()
         );
-    }
 
     public async Task<int> SavePerson(PersonModel model)
     {

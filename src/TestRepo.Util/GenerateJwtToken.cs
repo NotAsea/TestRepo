@@ -14,7 +14,7 @@ public sealed class GenerateJwtToken(IConfiguration configuration)
         var audience = configuration["Jwt:Audience"];
         var key = Encoding.UTF8.GetBytes(
             configuration["Jwt:Key"]
-            ?? throw new Exception("Not found Secret key in appsettings.json")
+                ?? throw new Exception("Not found Secret key in appsettings.json")
         );
         var tokenDescriptor = new SecurityTokenDescriptor
         {

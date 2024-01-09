@@ -1,4 +1,6 @@
-﻿namespace TestRepo.Api.Routes;
+﻿using TestRepo.Api.Models.AccountModels;
+
+namespace TestRepo.Api.Routes;
 
 internal static class AccountRoute
 {
@@ -10,9 +12,10 @@ internal static class AccountRoute
     internal static void HandleAccountRoute(this IEndpointRouteBuilder route)
     {
         route.MapPost("/", Login).AllowAnonymous();
-        route.MapGet("/{id:int}", GetAccounts);
+        route.MapGet("/{id:int}", GetAccounts).RequireAuthorization();
         route.MapPost("/register", Register).AllowAnonymous();
-        route.MapDelete("/{id:int}", DeleteAccount);
+        route.MapDelete("/{id:int}", DeleteAccount).RequireAuthorization();
+        route.MapGet("/current", CurrentAccountInfo).RequireAuthorization();
     }
 
     private static async Task<Results<Ok<AccountModel>, BadRequest<string>>> GetAccounts(
@@ -125,6 +128,24 @@ internal static class AccountRoute
         {
             var reason = ex.GetBaseException().Message;
             logger.WriteToDatabaseFail("Account", reason);
+            return TypedResults.BadRequest(reason);
+        }
+    }
+
+    private static async Task<Results<Ok<PersonAccount>, BadRequest<string>>> CurrentAccountInfo(
+        [AsParameters] AccountServiceParam param,
+        HttpContext context
+    )
+    {
+        var (logger, _, _, _) = param;
+        try
+        {
+            return TypedResults.Ok(await context.GetPersonFromToken());
+        }
+        catch (Exception ex)
+        {
+            var reason = ex.GetBaseException().Message;
+            logger.ReadTokenFail("Account", reason);
             return TypedResults.BadRequest(reason);
         }
     }

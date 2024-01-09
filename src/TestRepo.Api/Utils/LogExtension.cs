@@ -80,4 +80,17 @@ public static partial class LogExtension
         [CallerFilePath] string filePath = "",
         [CallerLineNumber] int line = 0
     );
+    
+    [LoggerMessage(
+        LogLevel.Error,
+        Message = "Fail while extracting person from Token, {reason}.\n At {memberName} int {filePath}, line {line}. \n {stackTrace}"
+    )]
+    public static partial void ReadTokenFail(
+        this ILogger logger,
+        string reason,
+        string stackTrace,
+        [CallerMemberName] string memberName = "",
+        [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int line = 0
+    );
 }

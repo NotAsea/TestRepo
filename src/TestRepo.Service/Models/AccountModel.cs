@@ -5,9 +5,8 @@ namespace TestRepo.Service.Models;
 
 public record AccountModel(int Id, string UserName, string Password, int PersonId)
 {
-    public AccountModel() : this(0, "", "", 0)
-    {
-    }
+    public AccountModel()
+        : this(0, "", "", 0) { }
 }
 
 public static class AccountVerifier
@@ -23,6 +22,12 @@ public static class AccountVerifier
         if (string.IsNullOrEmpty(model.Password))
         {
             sb.Append("Password cannot be null or empty,");
+        }
+        else if (RegexService.VerifyPassword(model.Password))
+        {
+            sb.Append(
+                "At least one lowercase, uppercase, number, and symbol exist in a 8+ character length password"
+            );
         }
 
         return sb.Length > 0 ? sb.ToString().TrimEnd(',') : string.Empty;

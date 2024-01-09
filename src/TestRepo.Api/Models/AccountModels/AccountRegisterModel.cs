@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Riok.Mapperly.Abstractions;
 
-namespace TestRepo.Api.Models;
+namespace TestRepo.Api.Models.AccountModels;
 
 public record AccountRegisterModel(
     string UserName,
@@ -31,7 +31,7 @@ public static class AccountRegisterModelVerifier
             sb.Append("Name cannot be null or Empty,");
         }
 
-        if (!string.IsNullOrEmpty(model.Email) && !CompileRegex.VerifyEmail(model.Email))
+        if (!string.IsNullOrEmpty(model.Email) && !RegexService.VerifyEmail(model.Email))
         {
             sb.Append("Wrong format Email,");
         }

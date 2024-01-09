@@ -1,4 +1,4 @@
-﻿namespace TestRepo.Api.Models;
+﻿namespace TestRepo.Api.Models.PersonModels;
 
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable once NotAccessedPositionalProperty.Global

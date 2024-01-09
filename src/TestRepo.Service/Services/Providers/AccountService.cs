@@ -1,4 +1,6 @@
-﻿namespace TestRepo.Service.Services.Providers;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace TestRepo.Service.Services.Providers;
 
 internal sealed class AccountService(IRepository repository, MyAppContext context)
     : BaseService(repository, context),
@@ -6,21 +8,40 @@ internal sealed class AccountService(IRepository repository, MyAppContext contex
 {
     private readonly IRepository _repository = repository;
 
-    public Task<AccountModel> GetAccount(int id)
-    {
-        return _repository.GetAsync<Account, AccountModel>(
+    public Task<AccountModel> GetAccount(int id) =>
+        _repository.GetAsync<Account, AccountModel>(
             a => a.Id == id && !a.IsDeleted,
             a => a.ToModel()
         );
-    }
 
-    public Task<AccountModel?> FindAccount(string username)
-    {
-        return _repository.GetAsync<Account, AccountModel?>(
+    public Task<PersonAccount?> GetFromPersonId(int id) =>
+        _repository
+            .GetQueryable<Account>()
+            .AsNoTracking()
+            .Where(a => !a.IsDeleted && a.PersonId == id)
+            .Join(
+                _repository.GetQueryable<Person>().AsNoTracking(),
+                a => a.PersonId,
+                p => p.Id,
+                (a, p) =>
+                    new PersonAccount
+                    {
+                        Id = p.Id,
+                        Description = p.Description,
+                        Email = p.Email,
+                        Name = p.Name,
+                        CreatedDate = p.CreatedDate,
+                        IsDeleted = p.IsDeleted,
+                        UserName = a.UserName
+                    }
+            )
+            .FirstOrDefaultAsync();
+
+    public Task<AccountModel?> FindAccount(string username) =>
+        _repository.GetAsync<Account, AccountModel?>(
             p => p.UserName == username && !p.IsDeleted,
             p => p.ToModel()
         );
-    }
 
     public async Task<int> SaveAccount(AccountModel model)
     {

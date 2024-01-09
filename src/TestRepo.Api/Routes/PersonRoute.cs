@@ -1,4 +1,6 @@
-﻿namespace TestRepo.Api.Routes;
+﻿using TestRepo.Api.Models.PersonModels;
+
+namespace TestRepo.Api.Routes;
 
 internal static class PersonRoute
 {

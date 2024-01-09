@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using TestRepo.Data.Entities;
+using TestRepo.Util;
 using Person = TestRepo.Data.Entities.Person;
 
 namespace TestRepo.Data;
@@ -31,7 +32,10 @@ internal static class SeedData
             .Ignore(p => p.Id)
             .RuleFor(p => p.IsDeleted, (_, _) => false)
             .RuleFor(p => p.UserName, (f, _) => f.Internet.UserName())
-            .RuleFor(p => p.Password, (f, _) => f.Internet.Password(14, true))
+            .RuleFor(
+                p => p.Password,
+                (f, _) => f.Internet.Password(14, true, Constant.PasswordRegex)
+            )
             .Ignore(p => p.PersonId);
 
         public void Dispose()

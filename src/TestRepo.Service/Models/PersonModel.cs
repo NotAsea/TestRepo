@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -29,7 +28,7 @@ public static class PersonModelVerifier
             msg.Append("Name cannot be null or Empty,");
         }
 
-        if (!string.IsNullOrEmpty(person.Email) && !CompileRegex.VerifyEmail(person.Email))
+        if (!string.IsNullOrEmpty(person.Email) && !RegexService.VerifyEmail(person.Email))
         {
             msg.Append("Wrong format Email,");
         }
@@ -49,21 +48,8 @@ public record ListReturn(List<PersonModel> Data, long Count);
 internal static partial class PersonModelMapper
 {
     internal static partial PersonModel ToModel(this Person entity);
+
     internal static partial Person ToEntity(this PersonModel model);
-}
-
-public static partial class CompileRegex
-{
-    [GeneratedRegex(
-        @"^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$",
-        RegexOptions.CultureInvariant
-    )]
-    private static partial Regex EmailRegex();
-
-    public static bool VerifyEmail(string email)
-    {
-        return EmailRegex().IsMatch(email);
-    }
 }
 
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
