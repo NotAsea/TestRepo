@@ -20,11 +20,11 @@ public sealed class AccountRegisterModelValidator : AbstractValidator<AccountReg
         RuleFor(x => x.Password)
             .NotEmpty()
             .WithMessage(Constant.ValueIsNull)
-            .Must(RegexService.VerifyPassword)
+            .Must(RegexUtility.VerifyPassword)
             .WithMessage(Constant.WrongPasswordFormat)
             .When(x => !string.IsNullOrEmpty(x.Password), ApplyConditionTo.CurrentValidator);
         RuleFor(x => x.Email)
-            .Must(RegexService.VerifyEmail!)
+            .Must(RegexUtility.VerifyEmail!)
             .WithMessage(Constant.WrongEmailFormat)
             .When(x => !string.IsNullOrEmpty(x.Email));
     }

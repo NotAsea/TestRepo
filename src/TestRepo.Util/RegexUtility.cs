@@ -2,7 +2,7 @@
 
 namespace TestRepo.Util;
 
-public static partial class RegexService
+public static partial class RegexUtility
 {
     [GeneratedRegex(Constant.EmailRegex, RegexOptions.CultureInvariant)]
     private static partial Regex EmailRegex();
