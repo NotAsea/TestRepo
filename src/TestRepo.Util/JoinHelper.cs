@@ -27,7 +27,7 @@ public static class JoinHelper
         Expression<Func<TLeft, TKey>> leftKey,
         Expression<Func<TRight, TKey>> rightKey,
         Expression<Func<TLeft, TRight?, TOutput>> join
-    ) => LeftJoin(left, right, leftKey, rightKey, join, EqualityComparer<TKey>.Default);
+    ) => LeftJoinImpl(left, right, leftKey, rightKey, join, EqualityComparer<TKey>.Default);
 
     /// <summary>
     /// Left join will outer join left to right collection, which mean, record not exist in right will stay null,

@@ -16,20 +16,18 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     /// <param name="data"></param>
     /// <typeparam name="T"></typeparam>
     /// <remarks>transaction is taking to account, so no trash data will leave in database</remarks>
-    protected async Task AddToDatabase<T>(T data)
-        where T : class
-    {
-        await QueryInTransactionScope(
+    protected Task AddToDatabase<T>(T data)
+        where T : class =>
+        QueryInTransactionScope(
             static async (repo, d) =>
             {
                 await repo.AddAsync(d);
-                await repo.SaveChangesAsync();
+                await repo.SaveChangesAsync().ConfigureAwait(false);
             },
             data,
             repository,
             true
         );
-    }
 
     /// <summary>
     ///     Insert multiple entities to database
@@ -37,15 +35,13 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     /// <param name="data"></param>
     /// <typeparam name="T"></typeparam>
     /// <remarks>transaction is taking to account, so no trash data will leave in database</remarks>
-    protected async Task AddToDatabase<T>(IEnumerable<T> data)
-        where T : class
-    {
-        await QueryInTransactionScope(
-            static async (ctx, d) => await ctx.BulkInsertAsync(d),
+    protected Task AddToDatabase<T>(IEnumerable<T> data)
+        where T : class =>
+        QueryInTransactionScope(
+            static async (ctx, d) => await ctx.BulkInsertAsync(d).ConfigureAwait(false),
             data,
             context
         );
-    }
 
     /// <summary>
     ///     Update this entity to database
@@ -53,20 +49,18 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     /// <param name="data"></param>
     /// <typeparam name="T"></typeparam>
     /// <remarks>transaction is taking to account, so no trash data will leave in database</remarks>
-    protected async Task UpdateToDatabase<T>(T data)
-        where T : class
-    {
-        await QueryInTransactionScope(
+    protected Task UpdateToDatabase<T>(T data)
+        where T : class =>
+        QueryInTransactionScope(
             static async (repo, d) =>
             {
                 repo.Update(d);
-                await repo.SaveChangesAsync();
+                await repo.SaveChangesAsync().ConfigureAwait(false);
             },
             data,
             repository,
             true
         );
-    }
 
     /// <summary>
     ///     Update multiple entities to database
@@ -74,15 +68,13 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     /// <param name="data"></param>
     /// <typeparam name="T"></typeparam>
     /// <remarks>transaction is taking to account, so no trash data will leave in database</remarks>
-    protected async Task UpdateToDatabase<T>(IEnumerable<T> data)
-        where T : class
-    {
-        await QueryInTransactionScope(
-            static async (ctx, d) => await ctx.BulkUpdateAsync(d),
+    protected Task UpdateToDatabase<T>(IEnumerable<T> data)
+        where T : class =>
+        QueryInTransactionScope(
+            static async (ctx, d) => await ctx.BulkUpdateAsync(d).ConfigureAwait(false),
             data,
             context
         );
-    }
 
     /// <summary>
     ///     <b>Permanent Delete</b> this entity to database.<br />
@@ -91,20 +83,18 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     /// <param name="data"></param>
     /// <typeparam name="T"></typeparam>
     /// <remarks>transaction is taking to account, so no trash data will leave in database</remarks>
-    protected async Task RemoveToDatabase<T>(T data)
-        where T : class
-    {
-        await QueryInTransactionScope(
+    protected Task RemoveToDatabase<T>(T data)
+        where T : class =>
+        QueryInTransactionScope(
             static async (repo, d) =>
             {
                 repo.Remove(d);
-                await repo.SaveChangesAsync();
+                await repo.SaveChangesAsync().ConfigureAwait(false);
             },
             data,
             repository,
             false
         );
-    }
 
     /// <summary>
     ///     <b>Permanent Delete</b> multiple entities to database.<br />
@@ -114,13 +104,11 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     /// <param name="data"></param>
     /// <typeparam name="T"></typeparam>
     /// <remarks>transaction is taking to account, so no trash data will leave in database</remarks>
-    protected async Task RemoveToDatabase<T>(IEnumerable<T> data)
-        where T : class
-    {
-        await QueryInTransactionScope(
-            static async (ctx, d) => await ctx.BulkDeleteAsync(d),
+    protected Task RemoveToDatabase<T>(IEnumerable<T> data)
+        where T : class =>
+        QueryInTransactionScope(
+            static async (ctx, d) => await ctx.BulkDeleteAsync(d).ConfigureAwait(false),
             data,
             context
         );
-    }
 }

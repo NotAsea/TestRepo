@@ -27,13 +27,13 @@ internal static class QueryTransactionStatic
         try
         {
             await action(repository, data);
-            await transaction.CommitAsync();
+            await transaction.CommitAsync().ConfigureAwait(false);
             if (isClearTrackerAfterDone)
                 repository.ClearChangeTracker();
         }
         catch
         {
-            await transaction.RollbackAsync();
+            await transaction.RollbackAsync().ConfigureAwait(false);
             throw;
         }
     }
@@ -59,11 +59,11 @@ internal static class QueryTransactionStatic
         try
         {
             await action(context, data);
-            await transaction.CommitAsync();
+            await transaction.CommitAsync().ConfigureAwait(false);
         }
         catch
         {
-            await transaction.RollbackAsync();
+            await transaction.RollbackAsync().ConfigureAwait(false);
             throw;
         }
     }

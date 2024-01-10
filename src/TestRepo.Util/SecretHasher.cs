@@ -15,10 +15,7 @@ public static class SecretHasher
     /// </summary>
     /// <param name="input">input string, often password</param>
     /// <returns>hash with embed salt, iteration, hash algorithm in the end</returns>
-    public static ValueTask<string> HashAsync(string input)
-    {
-        return ValueTask.FromResult(Hash(input));
-    }
+    public static ValueTask<string> HashAsync(string input) => ValueTask.FromResult(Hash(input));
 
     /// <summary>
     ///     Hash <paramref name="input" /> using PBKDF2 derived key wih SHA256
