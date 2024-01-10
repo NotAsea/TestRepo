@@ -49,6 +49,7 @@ internal static class AccountRoute
         {
             return TypedResults.BadRequest(msg.ToString(","));
         }
+
         try
         {
             var account = await service.FindAccount(model.UserName);
@@ -61,7 +62,7 @@ internal static class AccountRoute
             }
 
             var person = await personService.GetPerson(account.PersonId);
-            var token = await jwtToken.GetToken(person.Id, person.Name);
+            var token = await jwtToken.GetTokenForDay(person.Id, person.Name);
             return TypedResults.Ok(token);
         }
         catch (Exception ex)
@@ -101,7 +102,7 @@ internal static class AccountRoute
             person = person with { Id = id };
             account = account with { PersonId = id, Id = accountId };
             await accountService.SaveAccount(account);
-            var token = await jwtToken.GetToken(person.Id, person.Name);
+            var token = await jwtToken.GetTokenForDay(person.Id, person.Name);
             return TypedResults.Ok(token);
         }
         catch (Exception ex)

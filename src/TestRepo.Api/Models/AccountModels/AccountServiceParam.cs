@@ -5,4 +5,4 @@ public record AccountServiceParam(
     ILogger Logger,
     IAccountService Service,
     IPersonService PersonService,
-    GenerateJwtToken JwtToken);
+    TokenUtility JwtTokenUtility);
