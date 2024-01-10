@@ -11,4 +11,7 @@ public static class Constant
     public const string ValueIsNull = "Expect {PropertyName} has value but receive nothing";
 
     public const string WrongEmailFormat = "{PropertyName} is not a valid email format";
+
+    public const string WrongPasswordFormat =
+        "At least one lowercase, uppercase, number, and symbol exist in a 8+ character length password";
 }

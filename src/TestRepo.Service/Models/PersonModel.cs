@@ -15,7 +15,7 @@ public record PersonModel
     public DateTime CreatedDate { get; init; } = DateTime.UtcNow;
 }
 
-public class PersonModelValidator : AbstractValidator<PersonModel>
+public sealed class PersonModelValidator : AbstractValidator<PersonModel>
 {
     public PersonModelValidator()
     {
@@ -23,7 +23,7 @@ public class PersonModelValidator : AbstractValidator<PersonModel>
         RuleFor(x => x.Email)
             .Must(RegexService.VerifyEmail!)
             .WithMessage(Constant.WrongEmailFormat)
-            .When(x => !string.IsNullOrEmpty(x.Email), ApplyConditionTo.CurrentValidator);
+            .When(x => !string.IsNullOrEmpty(x.Email));
     }
 }
 

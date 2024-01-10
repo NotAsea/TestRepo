@@ -11,23 +11,22 @@ public record AccountRegisterModel(
     string? Description
 );
 
-public class AccountRegisterModelValidator : AbstractValidator<AccountRegisterModel>
+public sealed class AccountRegisterModelValidator : AbstractValidator<AccountRegisterModel>
 {
     public AccountRegisterModelValidator()
     {
         RuleFor(x => x.UserName).NotEmpty().WithMessage(Constant.ValueIsNull);
         RuleFor(x => x.Name).NotEmpty().WithMessage(Constant.ValueIsNull);
-        RuleFor(x => x.Password).NotEmpty().WithMessage(Constant.ValueIsNull);
         RuleFor(x => x.Password)
+            .NotEmpty()
+            .WithMessage(Constant.ValueIsNull)
             .Must(RegexService.VerifyPassword)
-            .WithMessage(
-                "At least one lowercase, uppercase, number, and symbol exist in a 8+ character length password"
-            )
+            .WithMessage(Constant.WrongPasswordFormat)
             .When(x => !string.IsNullOrEmpty(x.Password), ApplyConditionTo.CurrentValidator);
         RuleFor(x => x.Email)
             .Must(RegexService.VerifyEmail!)
             .WithMessage(Constant.WrongEmailFormat)
-            .When(x => !string.IsNullOrEmpty(x.Email), ApplyConditionTo.CurrentValidator);
+            .When(x => !string.IsNullOrEmpty(x.Email));
     }
 }
 

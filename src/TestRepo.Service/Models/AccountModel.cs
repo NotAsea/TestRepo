@@ -8,7 +8,7 @@ public record AccountModel(int Id, string UserName, string Password, int PersonI
     }
 }
 
-public class AccountValidator : AbstractValidator<AccountModel>
+public sealed class AccountValidator : AbstractValidator<AccountModel>
 {
     public AccountValidator()
     {
