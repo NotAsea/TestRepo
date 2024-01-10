@@ -37,3 +37,9 @@ public sealed class GenerateJwtToken(IConfiguration configuration)
         return ValueTask.FromResult(tokenHandler.WriteToken(token));
     }
 }
+
+public static class TokenValueExtractor
+{
+    public static string? GetFromJwt(this JwtSecurityToken token, string type) =>
+        token.Claims.FirstOrDefault(c => c.Type == type)?.Value;
+}

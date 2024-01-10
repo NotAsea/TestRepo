@@ -1,7 +1,4 @@
-﻿using System.Text;
-using System.Text.Json.Serialization;
-
-// ReSharper disable ClassNeverInstantiated.Global
+﻿// ReSharper disable ClassNeverInstantiated.Global
 
 namespace TestRepo.Service.Models;
 
@@ -18,27 +15,15 @@ public record PersonModel
     public DateTime CreatedDate { get; init; } = DateTime.UtcNow;
 }
 
-public static class PersonModelVerifier
+public class PersonModelValidator : AbstractValidator<PersonModel>
 {
-    public static string Verify(this PersonModel person, bool isAdd = false)
+    public PersonModelValidator()
     {
-        var msg = new StringBuilder();
-        if (string.IsNullOrEmpty(person.Name))
-        {
-            msg.Append("Name cannot be null or Empty,");
-        }
-
-        if (!string.IsNullOrEmpty(person.Email) && !RegexService.VerifyEmail(person.Email))
-        {
-            msg.Append("Wrong format Email,");
-        }
-
-        if (!isAdd && person.Id == 0)
-        {
-            msg.Append("Id cannot be zero,");
-        }
-
-        return msg.Length > 0 ? msg.ToString().TrimEnd(',') : string.Empty;
+        RuleFor(x => x.Name).NotEmpty().WithMessage(Constant.ValueIsNull);
+        RuleFor(x => x.Email)
+            .Must(RegexService.VerifyEmail!)
+            .WithMessage(Constant.WrongEmailFormat)
+            .When(x => !string.IsNullOrEmpty(x.Email), ApplyConditionTo.CurrentValidator);
     }
 }
 

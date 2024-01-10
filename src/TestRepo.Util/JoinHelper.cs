@@ -93,6 +93,4 @@ public static class JoinHelper
     }
 
     #endregion
-    
-    
 }

@@ -38,25 +38,23 @@ internal static class AccountRoute
 
     private static async Task<Results<Ok<string>, BadRequest<string>>> Login(
         [AsParameters] AccountServiceParam param,
+        IValidator<AccountModel> validator,
         AccountModel model
     )
     {
         var (logger, service, personService, jwtToken) = param;
-        var msg = model.Verify();
-        if (!string.IsNullOrEmpty(msg))
-        {
-            return TypedResults.BadRequest(msg);
-        }
 
+        var msg = await validator.ValidateAsync(model);
+        if (!msg.IsValid)
+        {
+            return TypedResults.BadRequest(msg.ToString(","));
+        }
         try
         {
             var account = await service.FindAccount(model.UserName);
             if (
-                account?.UserName != "Noah123"
-                && (
-                    account is null
-                    || !await SecretHasher.VerifyAsync(model.Password, account.Password)
-                )
+                account is null
+                || !await SecretHasher.VerifyAsync(model.Password, account.Password)
             )
             {
                 return TypedResults.BadRequest("wrong Username/ Password");
@@ -76,14 +74,15 @@ internal static class AccountRoute
 
     private static async Task<Results<Ok<string>, BadRequest<string>>> Register(
         [AsParameters] AccountServiceParam param,
+        IValidator<AccountRegisterModel> validator,
         AccountRegisterModel model
     )
     {
         var (logger, accountService, personService, jwtToken) = param;
-        var msg = model.Verify();
-        if (!string.IsNullOrEmpty(msg))
+        var msg = await validator.ValidateAsync(model);
+        if (!msg.IsValid)
         {
-            return TypedResults.BadRequest(msg);
+            return TypedResults.BadRequest(msg.ToString(","));
         }
 
         try

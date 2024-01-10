@@ -1,6 +1,5 @@
 ﻿namespace TestRepo.Service.Services.Providers;
 
-// ReSharper disable once SuggestBaseTypeForParameterInConstructor
 internal sealed class PersonService(IRepository repository, MyAppContext context)
     : BaseService(repository, context),
         IPersonService
@@ -24,11 +23,11 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
 
         spec.Conditions.Add(
             p =>
-                (
-                    string.IsNullOrEmpty(nameSearch)
-                    || p.Name.Contains(nameSearch)
-                    || (!string.IsNullOrEmpty(p.Email) && p.Email.Contains(nameSearch))
-                ) && !p.IsDeleted
+            (
+                string.IsNullOrEmpty(nameSearch)
+                || p.Name.Contains(nameSearch)
+                || (!string.IsNullOrEmpty(p.Email) && p.Email.Contains(nameSearch))
+            ) && !p.IsDeleted
         );
         var res = await _repository.GetListAsync(spec, x => x.ToModel());
         return new ListReturn(res.Items, res.TotalItems);

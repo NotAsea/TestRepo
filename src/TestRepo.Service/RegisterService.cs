@@ -1,7 +1,6 @@
 ﻿using Bogus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TestRepo.Util;
 using Person = TestRepo.Data.Entities.Person;
 
 namespace TestRepo.Service;
@@ -11,8 +10,24 @@ public static class RegisterService
     public static void AddService(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddRepository(configuration.GetConnectionString("default")!);
-        services.AddScoped<IPersonService, PersonService>();
-        services.AddScoped<IAccountService, AccountService>();
+
+        #region Service
+
+        services
+            .AddScoped<IPersonService, PersonService>()
+            .AddScoped<IAccountService, AccountService>();
+
+        #endregion
+
+        #region Validator
+
+        services
+            .AddScoped<IValidator<AccountModel>, AccountValidator>()
+            .AddScoped<IValidator<PersonModel>, PersonModelValidator>();
+
+        #endregion
+
+
         services
             .AddHttpClient<IGetDadJokeService, GetDadJokeService>(config =>
             {

@@ -7,6 +7,8 @@ namespace TestRepo.Data;
 
 internal static class SeedData
 {
+    #region Seeder
+
     private class PeronSeeder : IDisposable
     {
         private Faker<Person> _fakeUser = new Faker<Person>()
@@ -46,6 +48,8 @@ internal static class SeedData
         public IReadOnlyList<Account> GenAcc(int amount = 40) =>
             Enumerable.Range(1, amount).Select(_ => _fakeAccount.Generate()).ToList();
     }
+
+    #endregion
 
     public static IEnumerable<Person> GetPeople(int amount = 40)
     {

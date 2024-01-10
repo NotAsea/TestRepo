@@ -23,14 +23,15 @@ internal static class PersonRoute
 
     private static async Task<Results<Ok<int>, BadRequest<string>>> CreatePerson(
         [AsParameters] PersonRouteDefaultParam param,
+        IValidator<PersonModel> validator,
         PersonModel person
     )
     {
         var (logger, service, _) = param;
-        var msg = person.Verify(true);
-        if (!string.IsNullOrEmpty(msg))
+        var msg = await validator.ValidateAsync(person);
+        if (!msg.IsValid)
         {
-            return TypedResults.BadRequest(msg);
+            return TypedResults.BadRequest(msg.ToString(","));
         }
 
         try
@@ -130,14 +131,15 @@ internal static class PersonRoute
 
     private static async Task<Results<Ok<int>, BadRequest<string>>> UpdatePerson(
         [AsParameters] PersonRouteDefaultParam param,
+        IValidator<PersonModel> validator,
         PersonModel person
     )
     {
         var (logger, service, _) = param;
-        var msg = person.Verify();
-        if (!string.IsNullOrEmpty(msg))
+        var msg = await validator.ValidateAsync(person);
+        if (!msg.IsValid)
         {
-            return TypedResults.BadRequest(msg);
+            return TypedResults.BadRequest(msg.ToString(","));
         }
 
         try

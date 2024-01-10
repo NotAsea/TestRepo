@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TestRepo.Util;
 
 namespace TestRepo.Service.Services.Providers;
 

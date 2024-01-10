@@ -1,36 +1,19 @@
-﻿using System.Text;
-using System.Text.Json.Serialization;
-
-namespace TestRepo.Service.Models;
+﻿namespace TestRepo.Service.Models;
 
 public record AccountModel(int Id, string UserName, string Password, int PersonId)
 {
     public AccountModel()
-        : this(0, "", "", 0) { }
+        : this(0, "", "", 0)
+    {
+    }
 }
 
-public static class AccountVerifier
+public class AccountValidator : AbstractValidator<AccountModel>
 {
-    public static string Verify(this AccountModel model)
+    public AccountValidator()
     {
-        var sb = new StringBuilder();
-        if (string.IsNullOrEmpty(model.UserName))
-        {
-            sb.Append("Username cannot be null,");
-        }
-
-        if (string.IsNullOrEmpty(model.Password))
-        {
-            sb.Append("Password cannot be null or empty,");
-        }
-        else if (RegexService.VerifyPassword(model.Password))
-        {
-            sb.Append(
-                "At least one lowercase, uppercase, number, and symbol exist in a 8+ character length password"
-            );
-        }
-
-        return sb.Length > 0 ? sb.ToString().TrimEnd(',') : string.Empty;
+        RuleFor(x => x.UserName).NotEmpty().WithMessage(Constant.ValueIsNull);
+        RuleFor(x => x.Password).NotEmpty().WithMessage(Constant.ValueIsNull);
     }
 }
 

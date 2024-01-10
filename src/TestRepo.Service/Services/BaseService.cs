@@ -1,6 +1,4 @@
-﻿using static TestRepo.Data.QueryTransactionStatic;
-
-namespace TestRepo.Service.Services;
+﻿namespace TestRepo.Service.Services;
 
 // ReSharper disable once SuggestBaseTypeForParameterInConstructor
 /// <summary>
@@ -18,15 +16,14 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     /// <remarks>transaction is taking to account, so no trash data will leave in database</remarks>
     protected Task AddToDatabase<T>(T data)
         where T : class =>
-        QueryInTransactionScope(
+        QueryTransactionStatic.QueryInTransactionScope(
+            repository,
+            data,
             static async (repo, d) =>
             {
                 await repo.AddAsync(d);
                 await repo.SaveChangesAsync().ConfigureAwait(false);
-            },
-            data,
-            repository,
-            true
+            }
         );
 
     /// <summary>
@@ -37,10 +34,10 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     /// <remarks>transaction is taking to account, so no trash data will leave in database</remarks>
     protected Task AddToDatabase<T>(IEnumerable<T> data)
         where T : class =>
-        QueryInTransactionScope(
-            static async (ctx, d) => await ctx.BulkInsertAsync(d).ConfigureAwait(false),
+        QueryTransactionStatic.QueryInTransactionScope(
+            context,
             data,
-            context
+            static async (ctx, d) => await ctx.BulkInsertAsync(d).ConfigureAwait(false)
         );
 
     /// <summary>
@@ -51,15 +48,14 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     /// <remarks>transaction is taking to account, so no trash data will leave in database</remarks>
     protected Task UpdateToDatabase<T>(T data)
         where T : class =>
-        QueryInTransactionScope(
+        QueryTransactionStatic.QueryInTransactionScope(
+            repository,
+            data,
             static async (repo, d) =>
             {
                 repo.Update(d);
                 await repo.SaveChangesAsync().ConfigureAwait(false);
-            },
-            data,
-            repository,
-            true
+            }
         );
 
     /// <summary>
@@ -70,10 +66,10 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     /// <remarks>transaction is taking to account, so no trash data will leave in database</remarks>
     protected Task UpdateToDatabase<T>(IEnumerable<T> data)
         where T : class =>
-        QueryInTransactionScope(
-            static async (ctx, d) => await ctx.BulkUpdateAsync(d).ConfigureAwait(false),
+        QueryTransactionStatic.QueryInTransactionScope(
+            context,
             data,
-            context
+            static async (ctx, d) => await ctx.BulkUpdateAsync(d).ConfigureAwait(false)
         );
 
     /// <summary>
@@ -85,15 +81,14 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     /// <remarks>transaction is taking to account, so no trash data will leave in database</remarks>
     protected Task RemoveToDatabase<T>(T data)
         where T : class =>
-        QueryInTransactionScope(
+        QueryTransactionStatic.QueryInTransactionScope(
+            repository,
+            data,
             static async (repo, d) =>
             {
                 repo.Remove(d);
                 await repo.SaveChangesAsync().ConfigureAwait(false);
-            },
-            data,
-            repository,
-            false
+            }
         );
 
     /// <summary>
@@ -106,9 +101,9 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
     /// <remarks>transaction is taking to account, so no trash data will leave in database</remarks>
     protected Task RemoveToDatabase<T>(IEnumerable<T> data)
         where T : class =>
-        QueryInTransactionScope(
-            static async (ctx, d) => await ctx.BulkDeleteAsync(d).ConfigureAwait(false),
+        QueryTransactionStatic.QueryInTransactionScope(
+            context,
             data,
-            context
+            static async (ctx, d) => await ctx.BulkDeleteAsync(d).ConfigureAwait(false)
         );
 }

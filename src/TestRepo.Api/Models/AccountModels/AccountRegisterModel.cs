@@ -11,32 +11,23 @@ public record AccountRegisterModel(
     string? Description
 );
 
-public static class AccountRegisterModelVerifier
+public class AccountRegisterModelValidator : AbstractValidator<AccountRegisterModel>
 {
-    public static string Verify(this AccountRegisterModel model)
+    public AccountRegisterModelValidator()
     {
-        var sb = new StringBuilder();
-        if (string.IsNullOrEmpty(model.UserName))
-        {
-            sb.Append("Username cannot be null,");
-        }
-
-        if (string.IsNullOrEmpty(model.Password))
-        {
-            sb.Append("Password cannot be null or empty,");
-        }
-
-        if (string.IsNullOrEmpty(model.Name))
-        {
-            sb.Append("Name cannot be null or Empty,");
-        }
-
-        if (!string.IsNullOrEmpty(model.Email) && !RegexService.VerifyEmail(model.Email))
-        {
-            sb.Append("Wrong format Email,");
-        }
-
-        return sb.Length > 0 ? sb.ToString().TrimEnd(',') : string.Empty;
+        RuleFor(x => x.UserName).NotEmpty().WithMessage(Constant.ValueIsNull);
+        RuleFor(x => x.Name).NotEmpty().WithMessage(Constant.ValueIsNull);
+        RuleFor(x => x.Password).NotEmpty().WithMessage(Constant.ValueIsNull);
+        RuleFor(x => x.Password)
+            .Must(RegexService.VerifyPassword)
+            .WithMessage(
+                "At least one lowercase, uppercase, number, and symbol exist in a 8+ character length password"
+            )
+            .When(x => !string.IsNullOrEmpty(x.Password), ApplyConditionTo.CurrentValidator);
+        RuleFor(x => x.Email)
+            .Must(RegexService.VerifyEmail!)
+            .WithMessage(Constant.WrongEmailFormat)
+            .When(x => !string.IsNullOrEmpty(x.Email), ApplyConditionTo.CurrentValidator);
     }
 }
 

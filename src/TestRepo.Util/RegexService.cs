@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
-using TestRepo.Util;
 
-namespace TestRepo.Service;
+namespace TestRepo.Util;
 
 public static partial class RegexService
 {

@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace TestRepo.Service.Models;
+﻿namespace TestRepo.Service.Models;
 
 public record PersonAccount
 {
