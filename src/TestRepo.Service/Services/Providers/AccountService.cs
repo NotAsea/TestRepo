@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TestRepo.Util;
 
 namespace TestRepo.Service.Services.Providers;
 
@@ -17,21 +18,20 @@ internal sealed class AccountService(IRepository repository, MyAppContext contex
     public Task<PersonAccount?> GetFromPersonId(int id) =>
         _repository
             .GetQueryable<Account>()
-            .AsNoTracking()
             .Where(a => !a.IsDeleted && a.PersonId == id)
-            .Join(
-                _repository.GetQueryable<Person>().AsNoTracking(),
+            .LeftJoin(
+                _repository.GetQueryable<Person>(),
                 a => a.PersonId,
                 p => p.Id,
                 (a, p) =>
                     new PersonAccount
                     {
-                        Id = p.Id,
-                        Description = p.Description,
-                        Email = p.Email,
-                        Name = p.Name,
-                        CreatedDate = p.CreatedDate,
-                        IsDeleted = p.IsDeleted,
+                        Id = p != null ? p.Id : a.Id,
+                        Description = p != null ? p.Description : null,
+                        Email = p != null ? p.Email : null,
+                        Name = p != null ? p.Name : "",
+                        CreatedDate = p != null ? p.CreatedDate : DateTime.UtcNow,
+                        IsDeleted = p != null ? p.IsDeleted : a.IsDeleted,
                         UserName = a.UserName
                     }
             )
@@ -89,7 +89,7 @@ internal sealed class AccountService(IRepository repository, MyAppContext contex
 
         if (isForce)
         {
-            await RemoveToDatabase(entities);
+            await RemoveToDatabase(entities as IEnumerable<Account>);
         }
         else
         {
