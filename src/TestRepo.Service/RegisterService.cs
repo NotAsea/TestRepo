@@ -52,7 +52,11 @@ public static class StartupAction
 
         if (!await repository.ExistsAsync<Person>())
         {
-            await context.BulkInsertAsync(SeedData.GetPeople()).ConfigureAwait(false);
+            await context
+                .BulkInsertAsync(
+                    SeedData.GenerateFor(SeedData.PersonSetup)
+                )
+                .ConfigureAwait(false);
         }
 
         if (await repository.ExistsAsync<Account>())
@@ -60,7 +64,7 @@ public static class StartupAction
             return;
         }
 
-        var accounts = SeedData.GetAcc();
+        var accounts = SeedData.GenerateFor(SeedData.AccountSetup);
         var folder =
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\TestRepo";
         if (!Directory.Exists(folder))
