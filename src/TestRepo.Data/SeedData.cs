@@ -1,6 +1,6 @@
-﻿using Bogus;
+﻿using System.Text;
+using Bogus;
 using TestRepo.Data.Entities;
-using TestRepo.Util;
 using Person = TestRepo.Data.Entities.Person;
 
 namespace TestRepo.Data;
@@ -34,10 +34,7 @@ internal static class SeedData
             .Ignore(p => p.Id)
             .RuleFor(p => p.IsDeleted, (_, _) => false)
             .RuleFor(p => p.UserName, (f, _) => f.Internet.UserName())
-            .RuleFor(
-                p => p.Password,
-                (f, _) => f.Internet.Password(14, true, Constant.PasswordRegex)
-            )
+            .RuleFor(p => p.Password, (f, _) => f.Internet.Password(10, 14))
             .Ignore(p => p.PersonId);
 
         public void Dispose()
@@ -47,6 +44,44 @@ internal static class SeedData
 
         public IReadOnlyList<Account> GenAcc(int amount = 40) =>
             Enumerable.Range(1, amount).Select(_ => _fakeAccount.Generate()).ToList();
+    }
+
+    private static string Password(
+        this DataSet internet,
+        int minLength,
+        int maxLength,
+        bool includeUppercase = true,
+        bool includeNumber = true,
+        bool includeSymbol = true
+    )
+    {
+        ArgumentNullException.ThrowIfNull(internet);
+        ArgumentOutOfRangeException.ThrowIfLessThan(minLength, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(maxLength, minLength);
+
+        var r = internet.Random;
+        var s = new StringBuilder(maxLength);
+
+        s.Append(r.Char('a', 'z'));
+        if (s.Length < maxLength)
+        {
+            if (includeUppercase)
+                s.Append(r.Char('A', 'Z'));
+            if (includeNumber)
+                s.Append(r.Char('0', '9'));
+            if (includeSymbol)
+                s.Append(r.Char('#', '&'));
+        }
+
+        if (s.Length < minLength)
+            s.Append(r.String2(minLength - s.Length)); // pad up to min
+        if (s.Length < maxLength)
+            s.Append(r.String2(r.Number(0, maxLength - s.Length))); // random extra padding in range min..max
+
+        var chars = s.ToString();
+        var charsShuffled = r.Shuffle(chars).ToArray();
+
+        return new string(charsShuffled);
     }
 
     #endregion

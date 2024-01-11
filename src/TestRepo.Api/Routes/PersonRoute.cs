@@ -31,7 +31,7 @@ internal static class PersonRoute
         var msg = await validator.ValidateAsync(person);
         if (!msg.IsValid)
         {
-            return TypedResults.BadRequest(msg.ToString(","));
+            return TypedResults.BadRequest(msg.ToString("-"));
         }
 
         try
@@ -139,7 +139,7 @@ internal static class PersonRoute
         var msg = await validator.ValidateAsync(person);
         if (!msg.IsValid)
         {
-            return TypedResults.BadRequest(msg.ToString(","));
+            return TypedResults.BadRequest(msg.ToString("-"));
         }
 
         try

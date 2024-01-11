@@ -47,7 +47,7 @@ internal static class AccountRoute
         var msg = await validator.ValidateAsync(model);
         if (!msg.IsValid)
         {
-            return TypedResults.BadRequest(msg.ToString(","));
+            return TypedResults.BadRequest(msg.ToString("-"));
         }
 
         try
@@ -83,7 +83,7 @@ internal static class AccountRoute
         var msg = await validator.ValidateAsync(model);
         if (!msg.IsValid)
         {
-            return TypedResults.BadRequest(msg.ToString(","));
+            return TypedResults.BadRequest(msg.ToString("-"));
         }
 
         try
