@@ -1,12 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace TestRepo.Service.Services.Providers;
+﻿namespace TestRepo.Service.Services.Providers;
 
 internal sealed class AccountService(IRepository repository, MyAppContext context)
     : BaseService(repository, context),
         IAccountService
 {
     private readonly IRepository _repository = repository;
+    private readonly MyAppContext _context = context;
 
     public Task<AccountModel> GetAccount(int id) =>
         _repository.GetAsync<Account, AccountModel>(
@@ -14,27 +13,8 @@ internal sealed class AccountService(IRepository repository, MyAppContext contex
             a => a.ToModel()
         );
 
-    public Task<PersonAccount?> GetFromPersonId(int id) =>
-        _repository
-            .GetQueryable<Account>()
-            .Where(a => !a.IsDeleted && a.PersonId == id)
-            .LeftJoin(
-                _repository.GetQueryable<Person>(),
-                a => a.PersonId,
-                p => p.Id,
-                (a, p) =>
-                    new PersonAccount
-                    {
-                        Id = p != null ? p.Id : a.Id,
-                        Description = p != null ? p.Description : null,
-                        Email = p != null ? p.Email : null,
-                        Name = p != null ? p.Name : "",
-                        CreatedDate = p != null ? p.CreatedDate : DateTime.UtcNow,
-                        IsDeleted = p != null ? p.IsDeleted : a.IsDeleted,
-                        UserName = a.UserName
-                    }
-            )
-            .FirstOrDefaultAsync();
+    public async Task<PersonAccount?> GetFromPersonId(int id) =>
+        (await _context.GetPersonAccount(id)).ToModel();
 
     public Task<AccountModel?> FindAccount(string username) =>
         _repository.GetAsync<Account, AccountModel?>(

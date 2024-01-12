@@ -1,4 +1,6 @@
-﻿namespace TestRepo.Service.Models;
+﻿using TestRepo.Data.Dtos;
+
+namespace TestRepo.Service.Models;
 
 public record PersonAccount
 {
@@ -13,6 +15,11 @@ public record PersonAccount
     public DateTime CreatedDate { get; init; } = DateTime.UtcNow;
     public string UserName { get; init; } = string.Empty;
     public string Password { get; init; } = "********************************";
+}
+[Mapper()]
+internal static partial class PersonAccountMapper
+{
+    public static partial PersonAccount? ToModel(this PersonDto? dto);
 }
 
 [JsonSerializable(typeof(PersonAccount))]
