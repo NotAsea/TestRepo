@@ -73,7 +73,7 @@ internal static class StartupAction
         await FileUtil.WriteToFile(
             path,
             accounts,
-            (a) =>
+            static (a) =>
 
                 [
                     new PropertySelect(nameof(a.UserName), a.UserName),
