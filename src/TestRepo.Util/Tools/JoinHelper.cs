@@ -2,7 +2,7 @@
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace TestRepo.Util;
+namespace TestRepo.Util.Tools;
 
 public static class JoinHelper
 {

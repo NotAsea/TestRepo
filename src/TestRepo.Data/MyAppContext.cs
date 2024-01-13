@@ -1,6 +1,5 @@
 ﻿using TestRepo.Data.Dtos;
 using TestRepo.Data.Entities;
-using TestRepo.Util;
 
 // ReSharper disable ReturnTypeCanBeEnumerable.Global
 
@@ -21,19 +20,19 @@ internal class MyAppContext(DbContextOptions<MyAppContext> options) : DbContext(
                 context
                     .Set<Account>()
                     .Where(a => !a.IsDeleted && a.PersonId == id)
-                    .LeftJoin(
+                    .Join(
                         context.Set<Person>(),
                         a => a.PersonId,
                         p => p.Id,
                         (a, p) =>
                             new PersonDto
                             {
-                                Id = p != null ? p.Id : a.Id,
-                                Description = p != null ? p.Description : null,
-                                Email = p != null ? p.Email : null,
-                                Name = p != null ? p.Name : "",
-                                CreatedDate = p != null ? p.CreatedDate : DateTime.UtcNow,
-                                IsDeleted = p != null ? p.IsDeleted : a.IsDeleted,
+                                Id = p.Id,
+                                Description = p.Description,
+                                Email = p.Email,
+                                Name = p.Name,
+                                CreatedDate = p.CreatedDate,
+                                IsDeleted = p.IsDeleted,
                                 UserName = a.UserName
                             }
                     )

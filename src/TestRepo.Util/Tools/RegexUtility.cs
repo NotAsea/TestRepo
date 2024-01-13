@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace TestRepo.Util;
+namespace TestRepo.Util.Tools;
 
 public static partial class RegexUtility
 {

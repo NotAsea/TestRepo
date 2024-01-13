@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace TestRepo.Util;
+namespace TestRepo.Util.Tools;
 
 public static class SecretHasher
 {

@@ -1,4 +1,5 @@
 ﻿using TestRepo.Api.Models.AccountModels;
+using TestRepo.Util.Setup;
 
 namespace TestRepo.Api.Setup;
 
@@ -13,7 +14,7 @@ internal static class SetupWebApp
         builder.Services.AddEndpointsApiExplorer().AddHttpContextAccessor();
         builder.Services.AddAppAuthentication(builder.Configuration);
         builder.Services.AddSwagger();
-        builder.Services.AddService(builder.Configuration);
+        builder.Services.AddAppService(builder.Configuration);
         builder.Services.AddTransient(p =>
         {
             var logFactory = p.GetRequiredService<ILoggerFactory>();
@@ -56,7 +57,7 @@ internal static class SetupWebApp
         try
         {
             await using var scope = app.Services.CreateAsyncScope();
-            await scope.ServiceProvider.InitDb();
+            await scope.InitDb();
         }
         catch (Exception ex)
         {

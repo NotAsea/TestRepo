@@ -1,5 +1,7 @@
 ﻿// ReSharper disable ClassNeverInstantiated.Global
 
+using TestRepo.Util.Tools;
+
 namespace TestRepo.Service.Models;
 
 public record PersonModel
