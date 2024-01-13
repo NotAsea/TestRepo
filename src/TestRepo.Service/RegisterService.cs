@@ -8,6 +8,7 @@ public static class RegisterService
     public static void AddAppService(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddRepository(configuration.GetConnectionString("default")!);
+        services.AddMemoryCache();
 
         #region Service
 
@@ -44,4 +45,3 @@ public static class StartupAction
 {
     public static Task InitDb(this AsyncServiceScope scope) => scope.ServiceProvider.InitDb();
 }
-

@@ -1,8 +1,12 @@
-﻿namespace TestRepo.Service.Services.Providers;
+﻿using Microsoft.Extensions.Caching.Memory;
 
-internal sealed class AccountService(IRepository repository, MyAppContext context)
-    : BaseService(repository, context),
-        IAccountService
+namespace TestRepo.Service.Services.Providers;
+
+internal sealed class AccountService(
+    IRepository repository,
+    MyAppContext context,
+    IMemoryCache memoryCache
+) : BaseService(repository, context), IAccountService
 {
     private readonly IRepository _repository = repository;
     private readonly MyAppContext _context = context;
@@ -14,7 +18,15 @@ internal sealed class AccountService(IRepository repository, MyAppContext contex
         );
 
     public async Task<PersonAccount?> GetFromPersonId(int id) =>
-        (await _context.GetPersonAccount(id)).ToModel();
+        await memoryCache.GetOrCreateAsync(
+            id,
+            async (cacheKey) =>
+            {
+                cacheKey.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
+                cacheKey.SlidingExpiration = TimeSpan.FromMinutes(30);
+                return (await _context.GetPersonAccount(id)).ToModel();
+            }
+        );
 
     public Task<AccountModel?> FindAccount(string username) =>
         _repository.GetAsync<Account, AccountModel?>(
