@@ -51,12 +51,9 @@ internal sealed class AccountService(
 
     public async Task<int> DeleteAccount(int id, bool isForce)
     {
-        var entity = await _repository.GetByIdAsync<Account>(id, true);
-        if (entity is null)
-        {
-            throw new Exception("Not found Account");
-        }
-
+        var entity =
+            await _repository.GetByIdAsync<Account>(id, true)
+            ?? throw new Exception("Not found Account");
         if (isForce)
         {
             await RemoveToDatabase(entity);

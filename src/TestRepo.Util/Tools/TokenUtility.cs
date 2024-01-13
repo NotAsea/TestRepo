@@ -85,5 +85,10 @@ public sealed class TokenUtility(IConfiguration configuration)
 public static class TokenValueExtractor
 {
     public static string? GetFromJwt(this JwtSecurityToken token, AppTokenType type) =>
-        token.Claims.FirstOrDefault(c => c.Type == type.ToStringFast())?.Value;
+        token.Claims.Gen().Where(new TokenTypeFilter(type)).FirstOrDefault()?.Value;
+}
+
+file readonly struct TokenTypeFilter(AppTokenType type) : IStructFunction<Claim, bool>
+{
+    public bool Invoke(Claim arg) => arg.Type == type.ToStringFast();
 }

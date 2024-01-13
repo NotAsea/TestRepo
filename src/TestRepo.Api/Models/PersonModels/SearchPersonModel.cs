@@ -19,7 +19,10 @@ internal static class SearchPersonModelVerifier
                 ? param.SortType.ToLower()
                 : "asc";
         var possibleSortBy = new[] { "name", "email", "id", "createddate" };
-        if (!string.IsNullOrEmpty(param.SortBy) && !possibleSortBy.Contains(param.SortBy.ToLower()))
+        if (
+            !string.IsNullOrEmpty(param.SortBy)
+            && !possibleSortBy.ContainGenForStringEnumerable(param.SortType)
+        )
         {
             throw new InvalidDataException("Unknown SortBy");
         }

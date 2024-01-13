@@ -6,7 +6,7 @@ public static class FileUtil
 {
     private static FileStream OpenFileForWrite(string filePath, bool deleteOldFile = true)
     {
-        var path = Path.GetFullPath(filePath); // in case pass relative path, or else it still return original path;
+        var path = Path.GetFullPath(filePath); // in case pass relative path, or else it still returns original path;
         var folder = Path.GetDirectoryName(path);
         if (Directory.Exists(folder))
             Directory.CreateDirectory(folder);
@@ -28,11 +28,21 @@ public static class FileUtil
         var props = propertyToWrite(data[0]);
         await using var file = OpenFileForWrite(filePath, deleteOldFile);
         await using var writer = new StreamWriter(file);
-        await writer.WriteLineAsync(string.Join(',', props.Select(p => p.Name)));
+        await writer.WriteLineAsync(string.Join(',', props.Gen().Select(new SelectPropertyName()).ToList()));
         foreach (var d in data)
         {
             var prop = propertyToWrite(d);
-            await writer.WriteLineAsync(string.Join(',', prop.Select(p => p.Value)));
+            await writer.WriteLineAsync(string.Join(',', prop.Gen().Select(new SelectPropertyValue()).ToList()));
         }
     }
+}
+
+file readonly struct SelectPropertyName : IStructFunction<PropertySelect, string>
+{
+    public string Invoke(PropertySelect arg) => arg.Name;
+}
+
+file readonly struct SelectPropertyValue : IStructFunction<PropertySelect, string>
+{
+    public string Invoke(PropertySelect arg) => arg.Value;
 }

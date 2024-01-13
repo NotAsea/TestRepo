@@ -1,6 +1,4 @@
-﻿using TanvirArjel.EFCore.GenericRepository;
-
-namespace TestRepo.Data;
+﻿namespace TestRepo.Data;
 
 internal static class QueryTransactionStatic
 {

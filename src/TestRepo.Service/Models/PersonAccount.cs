@@ -16,11 +16,13 @@ public record PersonAccount
     public string UserName { get; init; } = string.Empty;
     public string Password { get; init; } = "********************************";
 }
-[Mapper()]
+
+[Mapper]
 internal static partial class PersonAccountMapper
 {
+    [MapperIgnoreTarget(nameof(PersonDto.Password))]
     public static partial PersonAccount? ToModel(this PersonDto? dto);
 }
 
 [JsonSerializable(typeof(PersonAccount))]
-public partial class PersonAccountSerializerContext: JsonSerializerContext;
+public partial class PersonAccountSerializerContext : JsonSerializerContext;

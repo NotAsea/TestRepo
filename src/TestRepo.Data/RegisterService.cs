@@ -1,8 +1,6 @@
 ﻿using Bogus;
 using Microsoft.Extensions.DependencyInjection;
-using TanvirArjel.EFCore.GenericRepository;
 using TestRepo.Data.CompiledModels;
-using TestRepo.Data.Entities;
 using TestRepo.Util;
 using TestRepo.Util.Tools;
 using Person = TestRepo.Data.Entities.Person;
