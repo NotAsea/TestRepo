@@ -21,6 +21,7 @@ internal static class RegisterService
         service.AddGenericRepository<MyAppContext>();
     }
 }
+
 internal static class StartupAction
 {
     /// <summary>
