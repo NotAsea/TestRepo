@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using Cysharp.Text;
 
 namespace TestRepo.Util;
 
@@ -58,7 +59,7 @@ public static class BogusPasswordGenExt
         ArgumentOutOfRangeException.ThrowIfLessThan(maxLength, minLength);
 
         var r = internet.Random;
-        var s = new StringBuilder(maxLength);
+        using var s = ZString.CreateStringBuilder(true);
 
         s.Append(r.Char('a', 'z'));
         if (s.Length < maxLength)

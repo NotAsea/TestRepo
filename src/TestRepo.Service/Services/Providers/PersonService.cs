@@ -1,4 +1,6 @@
-﻿namespace TestRepo.Service.Services.Providers;
+﻿using TestRepo.Util.Tools;
+
+namespace TestRepo.Service.Services.Providers;
 
 internal sealed class PersonService(IRepository repository, MyAppContext context)
     : BaseService(repository, context),
@@ -20,15 +22,14 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
             PageSize = size,
             OrderByDynamic = (sortBy, sortType)
         };
-
-        spec.Conditions.Add(
-            p =>
-                (
-                    string.IsNullOrEmpty(nameSearch)
-                    || p.Name.Contains(nameSearch)
+        if (nameSearch.NotNull())
+            spec.Conditions.Add(
+                p =>
+                    p.Name.Contains(nameSearch)
                     || (!string.IsNullOrEmpty(p.Email) && p.Email.Contains(nameSearch))
-                ) && !p.IsDeleted
-        );
+            );
+
+        spec.Conditions.Add(p => !p.IsDeleted);
         var res = await _repository.GetListAsync(spec, x => x.ToModel());
         return new ListReturn(res.Items, res.TotalItems);
     }

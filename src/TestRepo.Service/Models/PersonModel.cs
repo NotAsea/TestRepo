@@ -25,7 +25,7 @@ public sealed class PersonModelValidator : AbstractValidator<PersonModel>
         RuleFor(x => x.Email)
             .Must(RegexUtility.VerifyEmail!)
             .WithMessage(Constant.WrongEmailFormat)
-            .When(x => !string.IsNullOrEmpty(x.Email));
+            .When(x => x.Email.NotNull());
     }
 }
 

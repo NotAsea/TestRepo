@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using Cysharp.Text;
 
 namespace TestRepo.Util.Tools;
 
@@ -26,12 +27,12 @@ public static class SecretHasher
     {
         var salt = RandomNumberGenerator.GetBytes(SaltSize);
         var hash = Rfc2898DeriveBytes.Pbkdf2(input, salt, Iterations, Algorithm, KeySize);
-        return string.Join(
+        return ZString.Join(
             SegmentDelimiter,
             Convert.ToHexString(hash),
             Convert.ToHexString(salt),
-            Iterations,
-            Algorithm
+            Iterations.ToString(),
+            Algorithm.ToString()
         );
     }
 
@@ -40,7 +41,7 @@ public static class SecretHasher
     ///     <see cref="CryptographicOperations" /> for fixed time equal to defend time guessing.
     /// </summary>
     /// <param name="input">often password to verify</param>
-    /// <param name="hashString">an hash password hashed by <see cref="HashAsync" /></param>
+    /// <param name="hashString">a hash password hashed by <see cref="HashAsync" /></param>
     /// <returns>true if equal, false otherwise</returns>
     /// <remarks>
     ///     This function used to have sync version. But typically async nature of ASP.Net core, sync version was remove as we

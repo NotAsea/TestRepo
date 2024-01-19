@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Cysharp.Text;
+using TestRepo.Util.Tools;
 
 namespace TestRepo.Service.Services.Providers;
 
@@ -9,7 +11,7 @@ internal sealed class GetDadJokeService(HttpClient httpClient) : IGetDadJokeServ
     {
         SetHeader(httpClient, "application/json");
         return httpClient.GetFromJsonAsync(
-            string.IsNullOrEmpty(id) ? "/" : $"/j/{id}",
+            id.NotNull() ? ZString.Concat("/j/", id) : "/",
             DadJokeSerializerContext.Default.DadJokeModel
         );
     }
@@ -17,14 +19,14 @@ internal sealed class GetDadJokeService(HttpClient httpClient) : IGetDadJokeServ
     public Task<string> GetDadJokeAsString(string? id)
     {
         SetHeader(httpClient, "text/plain");
-        return httpClient.GetStringAsync(string.IsNullOrEmpty(id) ? "/" : $"/j/{id}");
+        return httpClient.GetStringAsync(id.NotNull() ? ZString.Concat("/j/", id) : "/");
     }
 
     public Task<DadJokeModelList?> SearchDadJoke(int? page, int? limit, string? term)
     {
         SetHeader(httpClient, "application/json");
         return httpClient.GetFromJsonAsync(
-            $"/search?page={page}&limit={limit}&term={term}",
+            ZString.Format("/search?page={page}&limit={limit}&term={term}", page, limit, term),
             DadJokeSerializerContext.Default.DadJokeModelList
         );
     }
@@ -32,7 +34,9 @@ internal sealed class GetDadJokeService(HttpClient httpClient) : IGetDadJokeServ
     public Task<string> SearchDadJokeAsString(int? page, int? limit, string? term)
     {
         SetHeader(httpClient, "text/plain");
-        return httpClient.GetStringAsync($"/search?page={page}&limit={limit}&term={term}");
+        return httpClient.GetStringAsync(
+            ZString.Format("/search?page={page}&limit={limit}&term={term}", page, limit, term)
+        );
     }
 
     private static void SetHeader(HttpClient client, string mediaQueryType)

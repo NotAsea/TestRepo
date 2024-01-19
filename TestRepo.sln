@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		LICENSE = LICENSE
 		README.md = README.md
+		.config\dotnet-tools.json = .config\dotnet-tools.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestRepo.Service", "src\TestRepo.Service\TestRepo.Service.csproj", "{2D5C7132-D1F9-451D-BF0E-D3C78F52145E}"
