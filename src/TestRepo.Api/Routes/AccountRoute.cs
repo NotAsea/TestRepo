@@ -5,7 +5,7 @@ namespace TestRepo.Api.Routes;
 internal static class AccountRoute
 {
     /// <summary>
-    ///     this consumes the <see cref="RouteGroupBuilder" /> and handle all logic and child route. <br />
+    ///     This consumes the <see cref="RouteGroupBuilder" /> and handle all logic and child route. <br />
     ///     This method must be and mean to be called last of <c>Map{Verb}</c> chain, as it return <see cref="Void" />
     /// </summary>
     /// <param name="route"></param>
@@ -26,7 +26,7 @@ internal static class AccountRoute
         var (logger, accountService, _, _) = param;
         try
         {
-            return TypedResults.Ok(await accountService.GetAccount(id));
+            return TypedResults.Ok(await accountService.GetAccount(id).ConfigureAwait(true));
         }
         catch (Exception ex)
         {
@@ -44,7 +44,7 @@ internal static class AccountRoute
     {
         var (logger, service, personService, jwtToken) = param;
 
-        var msg = await validator.ValidateAsync(model);
+        var msg = await validator.ValidateAsync(model).ConfigureAwait(true);
         if (!msg.IsValid)
         {
             return TypedResults.BadRequest(msg.ToString("-"));
@@ -52,19 +52,21 @@ internal static class AccountRoute
 
         try
         {
-            var account = await service.FindAccount(model.UserName);
+            var account = await service.FindAccount(model.UserName).ConfigureAwait(true);
             if (
                 account is null
-                || !await SecretHasher.VerifyAsync(model.Password, account.Password)
+                || !await SecretHasher
+                    .VerifyAsync(model.Password, account.Password)
+                    .ConfigureAwait(false)
             )
             {
                 return TypedResults.BadRequest("wrong Username/ Password");
             }
 
-            var person = await personService.GetPerson(account.PersonId);
-            var token = await jwtToken.GetTokenForDay(
-                [new TokenBody(AppTokenType.Id, person.Id.ToString())]
-            );
+            var person = await personService.GetPerson(account.PersonId).ConfigureAwait(true);
+            var token = await jwtToken
+                .GetTokenForDay([new TokenBody(AppTokenType.Id, person.Id.ToString())])
+                .ConfigureAwait(true);
             return TypedResults.Ok(token);
         }
         catch (Exception ex)
@@ -82,7 +84,7 @@ internal static class AccountRoute
     )
     {
         var (logger, accountService, personService, jwtToken) = param;
-        var msg = await validator.ValidateAsync(model);
+        var msg = await validator.ValidateAsync(model).ConfigureAwait(true);
         if (!msg.IsValid)
         {
             return TypedResults.BadRequest(msg.ToString("-"));
@@ -90,26 +92,26 @@ internal static class AccountRoute
 
         try
         {
-            var exist = await accountService.FindAccount(model.UserName);
+            var exist = await accountService.FindAccount(model.UserName).ConfigureAwait(true);
             if (exist != null)
             {
                 return TypedResults.BadRequest("UserName already exist!!");
             }
 
             var account = model.ToAccount();
-            account = account with { Password = await SecretHasher.HashAsync(account.Password) };
-            var accountId = await accountService.SaveAccount(account);
+            account = account with { Password = await SecretHasher.HashAsync(account.Password).ConfigureAwait(true) };
+            var accountId = await accountService.SaveAccount(account).ConfigureAwait(true);
             var person = model.ToPerson();
-            var id = await personService.SavePerson(person);
+            var id = await personService.SavePerson(person).ConfigureAwait(true);
             person = person with { Id = id };
             account = account with { PersonId = id, Id = accountId };
-            await accountService.SaveAccount(account);
+            await accountService.SaveAccount(account).ConfigureAwait(false);
             var token = await jwtToken.GetTokenForDay(
                 [
                     new TokenBody(AppTokenType.Id, person.Id.ToString()),
                     new TokenBody(AppTokenType.Name, person.Name)
                 ]
-            );
+            ).ConfigureAwait(true);
             return TypedResults.Ok(token);
         }
         catch (Exception ex)
@@ -129,7 +131,7 @@ internal static class AccountRoute
         var (logger, accountService, _, _) = param;
         try
         {
-            return TypedResults.Ok(await accountService.DeleteAccount(id, isForce));
+            return TypedResults.Ok(await accountService.DeleteAccount(id, isForce).ConfigureAwait(true));
         }
         catch (Exception ex)
         {
@@ -147,7 +149,7 @@ internal static class AccountRoute
         var (logger, _, _, _) = param;
         try
         {
-            return TypedResults.Ok(await context.GetPersonFromToken());
+            return TypedResults.Ok(await context.GetPersonFromToken().ConfigureAwait(true));
         }
         catch (Exception ex)
         {

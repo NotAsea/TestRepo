@@ -7,13 +7,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AutoRegisterInject" Version="1.4.0" ExcludeAssets="runtime"/>
 		<PackageReference Include="Bogus" Version="35.3.1" />
 		<PackageReference Include="LinqGen" Version="0.3.1" PrivateAssets="all" />
 		<PackageReference Include="LinqGen.Generator" Version="0.3.1" ExcludeAssets="runtime" PrivateAssets="all"/>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
 		<PackageReference Include="NetEscapades.EnumGenerators" Version="1.0.0-beta08" ExcludeAssets="runtime" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 		<PackageReference Include="ZString" Version="2.5.1" />
 	</ItemGroup>
 

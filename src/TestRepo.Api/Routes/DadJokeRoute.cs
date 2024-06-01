@@ -1,6 +1,6 @@
 ﻿namespace TestRepo.Api.Routes;
 
-public static class DadJokeRoute 
+public static class DadJokeRoute
 {
     public static void HandleDadJokeRoute(this IEndpointRouteBuilder route)
     {
@@ -18,8 +18,8 @@ public static class DadJokeRoute
         try
         {
             return asString
-                ? TypedResults.Ok(await service.GetDadJokeAsString(term))
-                : TypedResults.Ok(await service.GetDadJoke(term));
+                ? TypedResults.Ok(await service.GetDadJokeAsString(term).ConfigureAwait(true))
+                : TypedResults.Ok(await service.GetDadJoke(term).ConfigureAwait(true));
         }
         catch (Exception ex)
         {
@@ -43,8 +43,12 @@ public static class DadJokeRoute
         try
         {
             return asString
-                ? TypedResults.Ok(await service.SearchDadJokeAsString(page, limit, term))
-                : TypedResults.Ok(await service.SearchDadJoke(page, limit, term));
+                ? TypedResults.Ok(
+                    await service.SearchDadJokeAsString(page, limit, term).ConfigureAwait(true)
+                )
+                : TypedResults.Ok(
+                    await service.SearchDadJoke(page, limit, term).ConfigureAwait(true)
+                );
         }
         catch (Exception ex)
         {

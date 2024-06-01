@@ -5,7 +5,7 @@ namespace TestRepo.Api.Routes;
 internal static class PersonRoute
 {
     /// <summary>
-    ///     this consumes the <see cref="RouteGroupBuilder" /> and handle all logic and child route. <br />
+    ///     This consumes the <see cref="RouteGroupBuilder" /> and handle all logic and child route. <br />
     ///     This method must be and mean to be called last of <c>Map{Verb}</c> chain, as it return <see cref="Void" />
     /// </summary>
     /// <param name="route"></param>
@@ -28,7 +28,7 @@ internal static class PersonRoute
     )
     {
         var (logger, service, _) = param;
-        var msg = await validator.ValidateAsync(person);
+        var msg = await validator.ValidateAsync(person).ConfigureAwait(true);
         if (!msg.IsValid)
         {
             return TypedResults.BadRequest(msg.ToString("-"));
@@ -36,7 +36,7 @@ internal static class PersonRoute
 
         try
         {
-            return TypedResults.Ok(await service.SavePerson(person));
+            return TypedResults.Ok(await service.SavePerson(person).ConfigureAwait(true));
         }
         catch (Exception ex)
         {
@@ -55,7 +55,7 @@ internal static class PersonRoute
         var (logger, service, _) = param;
         try
         {
-            await service.DeletePerson(id, force);
+            await service.DeletePerson(id, force).ConfigureAwait(false);
             return TypedResults.Ok(id);
         }
         catch (Exception ex)
@@ -74,7 +74,7 @@ internal static class PersonRoute
         var (logger, service, _) = param;
         try
         {
-            await service.DeletePeople(peopleId, force);
+            await service.DeletePeople(peopleId, force).ConfigureAwait(false);
             return TypedResults.Ok(peopleId[0]);
         }
         catch (Exception ex)
@@ -92,7 +92,7 @@ internal static class PersonRoute
         var (logger, service, _) = param;
         try
         {
-            var res = await service.GetPerson(id);
+            var res = await service.GetPerson(id).ConfigureAwait(true);
             return TypedResults.Json(res, PersonSerializer.Default.PersonModel);
         }
         catch (Exception ex)
@@ -112,13 +112,15 @@ internal static class PersonRoute
         {
             search = search.Verify();
             return TypedResults.Json(
-                await service.GetPeople(
-                    search.Index,
-                    search.Size,
-                    search.SortBy,
-                    search.SortType,
-                    search.NameSearch
-                ),
+                await service
+                    .GetPeople(
+                        search.Index,
+                        search.Size,
+                        search.SortBy,
+                        search.SortType,
+                        search.NameSearch
+                    )
+                    .ConfigureAwait(true),
                 PersonSerializer.Default.ListReturn
             );
         }
@@ -136,7 +138,7 @@ internal static class PersonRoute
     )
     {
         var (logger, service, _) = param;
-        var msg = await validator.ValidateAsync(person);
+        var msg = await validator.ValidateAsync(person).ConfigureAwait(true);
         if (!msg.IsValid)
         {
             return TypedResults.BadRequest(msg.ToString("-"));
@@ -144,7 +146,7 @@ internal static class PersonRoute
 
         try
         {
-            await service.SavePerson(person);
+            await service.SavePerson(person).ConfigureAwait(true);
             return TypedResults.Ok(person.Id);
         }
         catch (Exception ex)
@@ -163,7 +165,7 @@ internal static class PersonRoute
         var (logger, service, _) = param;
         try
         {
-            await service.ActivatePerson(id);
+            await service.ActivatePerson(id).ConfigureAwait(false);
             return TypedResults.Ok(id);
         }
         catch (Exception ex)
@@ -182,7 +184,7 @@ internal static class PersonRoute
         var (logger, service, _) = param;
         try
         {
-            await service.ActivatePeople(ids);
+            await service.ActivatePeople(ids).ConfigureAwait(false);
             return TypedResults.Ok(ids[0]);
         }
         catch (Exception ex)

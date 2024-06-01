@@ -1,4 +1,6 @@
-﻿namespace TestRepo.Util.Tools;
+﻿using Cysharp.Text;
+
+namespace TestRepo.Util.Tools;
 
 public readonly record struct PropertySelect(string Name, string Value);
 
@@ -28,11 +30,15 @@ public static class FileUtil
         var props = propertyToWrite(data[0]);
         await using var file = OpenFileForWrite(filePath, deleteOldFile);
         await using var writer = new StreamWriter(file);
-        await writer.WriteLineAsync(string.Join(',', props.Gen().Select(new SelectPropertyName()).ToList()));
+        await writer.WriteLineAsync(
+            ZString.Join(',', props.Gen().Select(new SelectPropertyName()).ToList())
+        ).ConfigureAwait(false);
         foreach (var d in data)
         {
             var prop = propertyToWrite(d);
-            await writer.WriteLineAsync(string.Join(',', prop.Gen().Select(new SelectPropertyValue()).ToList()));
+            await writer.WriteLineAsync(
+                ZString.Join(',', prop.Gen().Select(new SelectPropertyValue()).ToList())
+            ).ConfigureAwait(false);
         }
     }
 }

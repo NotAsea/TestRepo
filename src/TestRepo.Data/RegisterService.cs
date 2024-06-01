@@ -53,14 +53,14 @@ internal static class StartupAction
     {
         var repository = provider.GetRequiredService<IRepository>();
         var context = provider.GetRequiredService<MyAppContext>();
-        await context.Database.EnsureCreatedAsync();
+        await context.Database.EnsureCreatedAsync().ConfigureAwait(false);
 
-        if (!await repository.ExistsAsync<Person>())
+        if (!await repository.ExistsAsync<Person>().ConfigureAwait(true))
         {
             await context.BulkInsertAsync(SeedData.GenerateFor(PersonSetup)).ConfigureAwait(false);
         }
 
-        if (await repository.ExistsAsync<Account>())
+        if (await repository.ExistsAsync<Account>().ConfigureAwait(true))
         {
             return;
         }
@@ -69,29 +69,32 @@ internal static class StartupAction
         var path =
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
             + @"\TestRepo\account.csv";
-        await FileUtil.WriteToFile(
-            path,
-            accounts,
-            static (a) =>
+        await FileUtil
+            .WriteToFile(
+                path,
+                accounts,
+                static (a) =>
 
-                [
-                    new PropertySelect(nameof(a.UserName), a.UserName),
-                    new PropertySelect(nameof(a.Password), a.Password)
-                ]
-        );
+                    [
+                        new PropertySelect(nameof(a.UserName), a.UserName),
+                        new PropertySelect(nameof(a.Password), a.Password)
+                    ]
+            )
+            .ConfigureAwait(false);
 
         var newAccounts = accounts.Select(a =>
         {
             a.Password = SecretHasher.Hash(a.Password);
             return a;
         });
-        if (await repository.ExistsAsync<Person>())
+        if (await repository.ExistsAsync<Person>().ConfigureAwait(true))
         {
-            var peopleId = await repository.GetListAsync<Person, int>(p => p.Id);
-            var faker = new Faker();
+            var peopleId = await repository
+                .GetListAsync<Person, int>(p => p.Id)
+                .ConfigureAwait(true);
             newAccounts = newAccounts.Select(a =>
             {
-                a.PersonId = faker.PickRandom(peopleId);
+                a.PersonId = new Faker().PickRandom(peopleId);
                 return a;
             });
         }

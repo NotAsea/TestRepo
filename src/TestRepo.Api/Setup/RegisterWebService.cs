@@ -6,7 +6,7 @@ namespace TestRepo.Api.Setup;
 internal static class SetupWebApp
 {
     /// <summary>
-    ///     All App Service should register here to keep main program clean
+    ///     All App Service should register here to keep the main program clean
     /// </summary>
     /// <param name="builder"></param>
     internal static void RegisterService(this WebApplicationBuilder builder)
@@ -39,17 +39,17 @@ internal static class SetupWebApp
     }
 
     /// <summary>
-    ///     All Startup action like use Middleware, set up Database, check request... should put in here to keep main program
-    ///     clean
+    ///     All Startup action like uses Middleware, set up Database, check request... should put in here to keep
+    ///     the main program clean
     /// </summary>
     /// <param name="app"></param>
     /// <returns></returns>
-    internal static async Task StartupAction(this WebApplication app)
+    internal static Task StartupAction(this WebApplication app)
     {
         app.UseSwagger();
         app.UseSwaggerUI();
         app.UseHttpsRedirection();
-        await app.InitialDb();
+        return app.InitialDb();
     }
 
     private static async Task InitialDb(this WebApplication app)
@@ -57,7 +57,7 @@ internal static class SetupWebApp
         try
         {
             await using var scope = app.Services.CreateAsyncScope();
-            await scope.InitDb();
+            await scope.InitDb().ConfigureAwait(false);
         }
         catch (Exception ex)
         {

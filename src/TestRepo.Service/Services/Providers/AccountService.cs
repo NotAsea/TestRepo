@@ -2,6 +2,7 @@
 
 namespace TestRepo.Service.Services.Providers;
 
+[RegisterScoped]
 internal sealed class AccountService(
     IRepository repository,
     MyAppContext context,
@@ -17,14 +18,14 @@ internal sealed class AccountService(
             a => a.ToModel()
         );
 
-    public async Task<PersonAccount?> GetFromPersonId(int id) =>
-        await memoryCache.GetOrCreateAsync(
+    public Task<PersonAccount?> GetFromPersonId(int id) =>
+        memoryCache.GetOrCreateAsync(
             id,
             async (cacheKey) =>
             {
                 cacheKey.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
                 cacheKey.SlidingExpiration = TimeSpan.FromMinutes(30);
-                return (await _context.GetPersonAccount(id)).ToModel();
+                return (await _context.GetPersonAccount(id).ConfigureAwait(true)).ToModel();
             }
         );
 
@@ -39,11 +40,11 @@ internal sealed class AccountService(
         var entity = model.ToEntity();
         if (entity.Id == 0)
         {
-            await AddToDatabase(entity);
+            await AddToDatabase(entity).ConfigureAwait(false);
         }
         else
         {
-            await UpdateToDatabase(entity);
+            await UpdateToDatabase(entity).ConfigureAwait(false);
         }
 
         return entity.Id;
@@ -52,16 +53,16 @@ internal sealed class AccountService(
     public async Task<int> DeleteAccount(int id, bool isForce)
     {
         var entity =
-            await _repository.GetByIdAsync<Account>(id, true)
+            await _repository.GetByIdAsync<Account>(id, true).ConfigureAwait(true)
             ?? throw new Exception("Not found Account");
         if (isForce)
         {
-            await RemoveToDatabase(entity);
+            await RemoveToDatabase(entity).ConfigureAwait(false);
         }
         else
         {
             entity.IsDeleted = true;
-            await UpdateToDatabase(entity);
+            await UpdateToDatabase(entity).ConfigureAwait(false);
         }
 
         return id;
@@ -69,7 +70,9 @@ internal sealed class AccountService(
 
     public async Task<int> DeleteAccount(int[] id, bool isForce)
     {
-        var entities = await _repository.GetListAsync<Account>(p => id.Contains(p.Id), true);
+        var entities = await _repository
+            .GetListAsync<Account>(p => id.Contains(p.Id), true)
+            .ConfigureAwait(true);
         if (entities is null or { Count: 0 })
         {
             throw new Exception("Not found Account");
@@ -77,17 +80,18 @@ internal sealed class AccountService(
 
         if (isForce)
         {
-            await RemoveToDatabase(entities as IEnumerable<Account>);
+            await RemoveToDatabase(entities as IEnumerable<Account>).ConfigureAwait(false);
         }
         else
         {
             await UpdateToDatabase(
-                entities.Select(static a =>
-                {
-                    a.IsDeleted = true;
-                    return a;
-                })
-            );
+                    entities.Select(static a =>
+                    {
+                        a.IsDeleted = true;
+                        return a;
+                    })
+                )
+                .ConfigureAwait(false);
         }
 
         return id[0];

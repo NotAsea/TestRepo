@@ -6,23 +6,19 @@ public static class AddSwaggerExt
 {
     public static void AddSwagger(this IServiceCollection services)
     {
-        services.AddSwaggerGen(option =>
+        services.AddSwaggerGen(c =>
         {
-            option.AddSecurityDefinition(
-                "Bearer",
+            c.AddSecurityDefinition(
+                "bearerAuth",
                 new OpenApiSecurityScheme
                 {
-                    Name = "Authorization",
                     Type = SecuritySchemeType.Http,
-                    Scheme = "Bearer",
+                    Scheme = "bearer",
                     BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Description =
-                        // ReSharper disable once StringLiteralTypo
-                        """JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token in the text input below.\r\n\r\nExample: "1safsfsdfdfd" """
+                    Description = "JWT Authorization header using the Bearer scheme."
                 }
             );
-            option.AddSecurityRequirement(
+            c.AddSecurityRequirement(
                 new OpenApiSecurityRequirement
                 {
                     {
@@ -31,7 +27,7 @@ public static class AddSwaggerExt
                             Reference = new OpenApiReference
                             {
                                 Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
+                                Id = "bearerAuth"
                             }
                         },
                         Array.Empty<string>()

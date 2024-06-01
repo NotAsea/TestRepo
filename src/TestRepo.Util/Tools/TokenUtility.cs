@@ -56,13 +56,15 @@ public sealed class TokenUtility(IConfiguration configuration)
             configuration["Jwt:Key"]
                 ?? throw new Exception("Not found Secret key in appsettings.json")
         );
-        var claimIdentity = new ClaimsIdentity();
-        foreach (var (type, value) in dataBody)
-        {
-            if (!AppTokenTypeExtensions.IsDefined(type))
-                throw new Exception("Invalid token type");
-            claimIdentity.AddClaim(new Claim(type.ToStringFast(), value));
-        }
+        var claimIdentity = new ClaimsIdentity(
+            dataBody.Select(x =>
+            {
+                var (type, value) = x;
+                if (!AppTokenTypeExtensions.IsDefined(type))
+                    throw new Exception("Invalid token type");
+                return new Claim(type.ToStringFast(), value);
+            })
+        );
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

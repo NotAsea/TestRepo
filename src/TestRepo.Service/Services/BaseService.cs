@@ -1,6 +1,5 @@
 ﻿namespace TestRepo.Service.Services;
 
-// ReSharper disable once SuggestBaseTypeForParameterInConstructor
 /// <summary>
 ///     Base service class contain boilerplate code to add, update and remove entity
 /// </summary>
@@ -21,7 +20,7 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
             data,
             static async (repo, d) =>
             {
-                await repo.AddAsync(d);
+                await repo.AddAsync(d).ConfigureAwait(false);
                 await repo.SaveChangesAsync().ConfigureAwait(false);
             }
         );
@@ -37,7 +36,7 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
         QueryTransactionStatic.QueryInTransactionScope(
             context,
             data,
-            static async (ctx, d) => await ctx.BulkInsertAsync(d).ConfigureAwait(false)
+            static (ctx, d) => ctx.BulkInsertAsync(d)
         );
 
     /// <summary>
@@ -51,10 +50,10 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
         QueryTransactionStatic.QueryInTransactionScope(
             repository,
             data,
-            static async (repo, d) =>
+            static (repo, d) =>
             {
                 repo.Update(d);
-                await repo.SaveChangesAsync().ConfigureAwait(false);
+                return repo.SaveChangesAsync();
             }
         );
 
@@ -69,7 +68,7 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
         QueryTransactionStatic.QueryInTransactionScope(
             context,
             data,
-            static async (ctx, d) => await ctx.BulkUpdateAsync(d).ConfigureAwait(false)
+            static (ctx, d) => ctx.BulkUpdateAsync(d)
         );
 
     /// <summary>
@@ -84,10 +83,10 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
         QueryTransactionStatic.QueryInTransactionScope(
             repository,
             data,
-            static async (repo, d) =>
+            static (repo, d) =>
             {
                 repo.Remove(d);
-                await repo.SaveChangesAsync().ConfigureAwait(false);
+                return repo.SaveChangesAsync();
             }
         );
 
@@ -104,6 +103,6 @@ internal abstract class BaseService(IRepository repository, MyAppContext context
         QueryTransactionStatic.QueryInTransactionScope(
             context,
             data,
-            static async (ctx, d) => await ctx.BulkDeleteAsync(d).ConfigureAwait(false)
+            static (ctx, d) => ctx.BulkDeleteAsync(d)
         );
 }

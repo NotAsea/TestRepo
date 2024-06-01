@@ -2,6 +2,7 @@
 
 namespace TestRepo.Service.Services.Providers;
 
+[RegisterScoped]
 internal sealed class PersonService(IRepository repository, MyAppContext context)
     : BaseService(repository, context),
         IPersonService
@@ -23,14 +24,13 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
             OrderByDynamic = (sortBy, sortType)
         };
         if (nameSearch.NotNull())
-            spec.Conditions.Add(
-                p =>
-                    p.Name.Contains(nameSearch)
-                    || (!string.IsNullOrEmpty(p.Email) && p.Email.Contains(nameSearch))
+            spec.Conditions.Add(p =>
+                p.Name.Contains(nameSearch)
+                || (!string.IsNullOrEmpty(p.Email) && p.Email.Contains(nameSearch))
             );
 
         spec.Conditions.Add(p => !p.IsDeleted);
-        var res = await _repository.GetListAsync(spec, x => x.ToModel());
+        var res = await _repository.GetListAsync(spec, x => x.ToModel()).ConfigureAwait(true);
         return new ListReturn(res.Items, res.TotalItems);
     }
 
@@ -45,11 +45,11 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
         var entity = model.ToEntity();
         if (entity.Id == 0)
         {
-            await AddToDatabase(entity);
+            await AddToDatabase(entity).ConfigureAwait(false);
         }
         else
         {
-            await UpdateToDatabase(entity);
+            await UpdateToDatabase(entity).ConfigureAwait(false);
         }
 
         return entity.Id;
@@ -57,7 +57,9 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
 
     public async Task DeletePeople(int[] peopleId, bool isForce)
     {
-        var people = await _repository.GetListAsync<Person>(p => peopleId.Contains(p.Id), true);
+        var people = await _repository
+            .GetListAsync<Person>(p => peopleId.Contains(p.Id), true)
+            .ConfigureAwait(true);
         if (people is null or { Count: 0 })
         {
             throw new Exception("Not found People");
@@ -65,59 +67,63 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
 
         if (isForce)
         {
-            await RemoveToDatabase(people as IEnumerable<Person>);
+            await RemoveToDatabase(people as IEnumerable<Person>).ConfigureAwait(false);
         }
         else
         {
             await UpdateToDatabase(
-                people.Select(static p =>
-                {
-                    p.IsDeleted = true;
-                    return p;
-                })
-            );
+                    people.Select(static p =>
+                    {
+                        p.IsDeleted = true;
+                        return p;
+                    })
+                )
+                .ConfigureAwait(false);
         }
     }
 
     public async Task DeletePerson(int id, bool isForce)
     {
         var person =
-            await _repository.GetByIdAsync<Person>(id, true)
+            await _repository.GetByIdAsync<Person>(id, true).ConfigureAwait(true)
             ?? throw new Exception("Not found Person");
         if (isForce)
         {
-            await RemoveToDatabase(person);
+            await RemoveToDatabase(person).ConfigureAwait(false);
         }
         else
         {
             person.IsDeleted = true;
-            await UpdateToDatabase(person);
+            await UpdateToDatabase(person).ConfigureAwait(false);
         }
     }
 
     public async Task ActivatePerson(int id)
     {
         var person =
-            await _repository.GetByIdAsync<Person>(id, true)
+            await _repository.GetByIdAsync<Person>(id, true).ConfigureAwait(true)
             ?? throw new Exception("No person found");
         person.IsDeleted = false;
-        await UpdateToDatabase(person);
+        await UpdateToDatabase(person).ConfigureAwait(false);
     }
 
     public async Task ActivatePeople(int[] ids)
     {
-        var people = await _repository.GetListAsync<Person>(p => ids.Contains(p.Id), true);
+        var people = await _repository
+            .GetListAsync<Person>(p => ids.Contains(p.Id), true)
+            .ConfigureAwait(true);
         if (people is null or { Count: 0 })
         {
             throw new Exception("No person found");
         }
 
         await UpdateToDatabase(
-            people.Select(static p =>
-            {
-                p.IsDeleted = false;
-                return p;
-            })
-        );
+                people.Select(static p =>
+                {
+                    p.IsDeleted = false;
+                    return p;
+                })
+            )
+            .ConfigureAwait(false);
     }
 }

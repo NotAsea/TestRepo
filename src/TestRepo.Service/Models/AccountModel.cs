@@ -8,6 +8,7 @@ public record AccountModel(int Id, string UserName, string Password, int PersonI
     }
 }
 
+[RegisterScoped(typeof(IValidator<AccountModel>))]
 public sealed class AccountValidator : AbstractValidator<AccountModel>
 {
     public AccountValidator()

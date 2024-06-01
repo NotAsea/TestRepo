@@ -1,6 +1,4 @@
-﻿// ReSharper disable ClassNeverInstantiated.Global
-
-using TestRepo.Util.Tools;
+﻿using TestRepo.Util.Tools;
 
 namespace TestRepo.Service.Models;
 
@@ -17,9 +15,10 @@ public record PersonModel
     public DateTime CreatedDate { get; init; } = DateTime.UtcNow;
 }
 
-public sealed class PersonModelValidator : AbstractValidator<PersonModel>
+[RegisterScoped(typeof(IValidator<PersonModel>))]
+public sealed class PersonValidator : AbstractValidator<PersonModel>
 {
-    public PersonModelValidator()
+    public PersonValidator()
     {
         RuleFor(x => x.Name).NotEmpty().WithMessage(Constant.ValueIsNull);
         RuleFor(x => x.Email)

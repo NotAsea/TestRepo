@@ -9,23 +9,7 @@ public static class RegisterService
     {
         services.AddRepository(configuration.GetConnectionString("default")!);
         services.AddMemoryCache();
-
-        #region Service
-
-        services
-            .AddScoped<IPersonService, PersonService>()
-            .AddScoped<IAccountService, AccountService>();
-
-        #endregion
-
-        #region Validator
-
-        services
-            .AddScoped<IValidator<AccountModel>, AccountValidator>()
-            .AddScoped<IValidator<PersonModel>, PersonModelValidator>();
-
-        #endregion
-
+        services.AutoRegisterFromTestRepoService();
 
         services
             .AddHttpClient<IGetDadJokeService, GetDadJokeService>(config =>

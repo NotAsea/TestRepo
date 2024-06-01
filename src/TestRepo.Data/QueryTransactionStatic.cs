@@ -21,10 +21,10 @@ internal static class QueryTransactionStatic
     )
         where T : class
     {
-        await using var transaction = await repository.BeginTransactionAsync();
+        await using var transaction = await repository.BeginTransactionAsync().ConfigureAwait(true);
         try
         {
-            await action(repository, data);
+            await action(repository, data).ConfigureAwait(false);
             await transaction.CommitAsync().ConfigureAwait(false);
             if (isClearTrackerAfterDone)
                 repository.ClearChangeTracker();
@@ -53,10 +53,10 @@ internal static class QueryTransactionStatic
     )
         where T : class
     {
-        await using var transaction = await context.Database.BeginTransactionAsync();
+        await using var transaction = await context.Database.BeginTransactionAsync().ConfigureAwait(true);
         try
         {
-            await action(context, data);
+            await action(context, data).ConfigureAwait(false);
             await transaction.CommitAsync().ConfigureAwait(false);
         }
         catch
