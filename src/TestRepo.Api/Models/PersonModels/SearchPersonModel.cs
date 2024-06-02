@@ -18,7 +18,7 @@ internal static class SearchPersonModelVerifier
             || string.Equals(param.SortType, "desc", StringComparison.CurrentCultureIgnoreCase)
                 ? param.SortType.ToLower()
                 : "asc";
-        var possibleSortBy = new[] { "name", "email", "id", "createddate" };
+        string[] possibleSortBy = ["name", "email", "id", "createddate"];
         if (
             !string.IsNullOrEmpty(param.SortBy)
             && !possibleSortBy.ContainGenForStringEnumerable(param.SortType)

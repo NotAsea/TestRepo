@@ -8,7 +8,9 @@ public record AccountModel(int Id, string UserName, string Password, int PersonI
     }
 }
 
-[RegisterScoped(typeof(IValidator<AccountModel>))]
+#region Mapper, Serailizer, Validator
+
+[RegisterSingleton(typeof(IValidator<AccountModel>))]
 public sealed class AccountValidator : AbstractValidator<AccountModel>
 {
     public AccountValidator()
@@ -35,3 +37,5 @@ internal static partial class AccountMapper
 [JsonSerializable(typeof(List<AccountModel>))]
 [JsonSerializable(typeof(AccountModel))]
 public partial class AccountSerializerContext : JsonSerializerContext;
+
+#endregion

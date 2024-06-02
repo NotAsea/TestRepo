@@ -1,10 +1,16 @@
-﻿using TestRepo.Api.Models.AccountModels;
+﻿using Microsoft.Extensions.Options;
+
+using TestRepo.Api.Models.AccountModels;
 using TestRepo.Util.Setup;
 
 namespace TestRepo.Api.Setup;
 
 internal static class SetupWebApp
 {
+    internal sealed class MySetting
+    {
+        public string Host { get; set; } = string.Empty;
+    }
     /// <summary>
     ///     All App Service should register here to keep the main program clean
     /// </summary>
@@ -15,6 +21,7 @@ internal static class SetupWebApp
         builder.Services.AddAppAuthentication(builder.Configuration);
         builder.Services.AddSwagger();
         builder.Services.AddAppService(builder.Configuration);
+        builder.Services.AutoRegisterFromTestRepoApi();
         builder.Services.AddTransient(p =>
         {
             var logFactory = p.GetRequiredService<ILoggerFactory>();
@@ -32,10 +39,6 @@ internal static class SetupWebApp
                 PersonAccountSerializerContext.Default
             );
         });
-        builder.Services.AddScoped<
-            IValidator<AccountRegisterModel>,
-            AccountRegisterModelValidator
-        >();
     }
 
     /// <summary>

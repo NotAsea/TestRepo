@@ -11,6 +11,9 @@ public record AccountRegisterModel(
     string? Description
 );
 
+#region Validator, Serailizer, Mapper
+
+[RegisterSingleton(typeof(IValidator<AccountRegisterModel>))]
 public sealed class AccountRegisterModelValidator : AbstractValidator<AccountRegisterModel>
 {
     public AccountRegisterModelValidator()
@@ -50,3 +53,5 @@ public static partial class AccountRegisterModelMapper
 
 [JsonSerializable(typeof(AccountRegisterModel))]
 public partial class AccountRegisterModelSerializerContext : JsonSerializerContext;
+
+#endregion

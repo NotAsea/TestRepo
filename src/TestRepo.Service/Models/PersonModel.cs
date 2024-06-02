@@ -15,7 +15,9 @@ public record PersonModel
     public DateTime CreatedDate { get; init; } = DateTime.UtcNow;
 }
 
-[RegisterScoped(typeof(IValidator<PersonModel>))]
+#region Validator, Mapper, Serializer
+
+[RegisterSingleton(typeof(IValidator<PersonModel>))]
 public sealed class PersonValidator : AbstractValidator<PersonModel>
 {
     public PersonValidator()
@@ -43,3 +45,5 @@ internal static partial class PersonModelMapper
 [JsonSerializable(typeof(List<PersonModel>))]
 [JsonSerializable(typeof(PersonModel))]
 public partial class PersonSerializer : JsonSerializerContext;
+
+#endregion

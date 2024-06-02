@@ -17,6 +17,8 @@ public record PersonAccount
     public string Password { get; init; } = "********************************";
 }
 
+#region Mapper, Serailizer
+
 [Mapper]
 internal static partial class PersonAccountMapper
 {
@@ -26,3 +28,5 @@ internal static partial class PersonAccountMapper
 
 [JsonSerializable(typeof(PersonAccount))]
 public partial class PersonAccountSerializerContext : JsonSerializerContext;
+
+#endregion

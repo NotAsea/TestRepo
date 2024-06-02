@@ -24,14 +24,16 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
             OrderByDynamic = (sortBy, sortType)
         };
         if (nameSearch.NotNull())
+        {
             spec.Conditions.Add(p =>
                 p.Name.Contains(nameSearch)
                 || (!string.IsNullOrEmpty(p.Email) && p.Email.Contains(nameSearch))
             );
+        }
 
         spec.Conditions.Add(p => !p.IsDeleted);
         var res = await _repository.GetListAsync(spec, x => x.ToModel()).ConfigureAwait(true);
-        return new ListReturn(res.Items, res.TotalItems);
+        return new(res.Items, res.TotalItems);
     }
 
     public Task<PersonModel> GetPerson(int id) =>
