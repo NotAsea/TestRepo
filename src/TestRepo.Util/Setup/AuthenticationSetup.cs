@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using TestRepo.Util.Tools;
 
 namespace TestRepo.Util.Setup;
 
@@ -38,6 +37,6 @@ public static class AuthenticationSetup
                 };
             });
         services.AddAuthorization();
-        services.AddScoped<TokenUtility>();
+        services.AutoRegisterFromTestRepoUtil();
     }
 }

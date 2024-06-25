@@ -10,7 +10,7 @@ public static class FileUtil
     {
         var path = Path.GetFullPath(filePath); // in case pass relative path, or else it still returns original path;
         var folder = Path.GetDirectoryName(path);
-        if (Directory.Exists(folder))
+        if (!Directory.Exists(folder))
             Directory.CreateDirectory(folder);
         if (deleteOldFile && File.Exists(path))
             File.Delete(path);

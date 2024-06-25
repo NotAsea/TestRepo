@@ -14,6 +14,7 @@ public enum AppTokenType
     Name
 }
 
+[RegisterSingleton]
 public sealed class TokenUtility(IConfiguration configuration)
 {
     /// <summary>
@@ -21,7 +22,7 @@ public sealed class TokenUtility(IConfiguration configuration)
     /// the generated token live for 1 week, but can be set through <paramref name="liveDays"/>
     /// </summary>
     /// <param name="liveDays">how many day should this token valid</param>
-    /// <param name="dataBody">data is array of value pair for its type and value</param>
+    /// <param name="dataBody">data is an array of value pairs for its type and value</param>
     /// <returns>generated token as encoded string</returns>
     /// <exception cref="Exception">app setting is not valid</exception>
     public ValueTask<string> GetTokenForDay(TokenBody[] dataBody, int liveDays = 7) =>
@@ -29,10 +30,10 @@ public sealed class TokenUtility(IConfiguration configuration)
 
     /// <summary>
     /// Generate JWT token which contains <paramref name="dataBody"/>,
-    /// the generated token live for 30 minute, but can be set through <paramref name="liveTime"/>
+    /// the generated token live for 30 minutes, but can be set through <paramref name="liveTime"/>
     /// </summary>
-    /// <param name="liveTime">how many minute should this token valid</param>
-    /// <param name="dataBody">data is array of value pair for its type and value</param>
+    /// <param name="liveTime">how many minutes should this token valid?</param>
+    /// <param name="dataBody">data is an array of value pairs for its type and value</param>
     /// <returns>generated token as encoded string</returns>
     /// <exception cref="Exception">app setting is not valid</exception>
     public ValueTask<string> GetTokenForMinute(TokenBody[] dataBody, int liveTime = 30) =>
@@ -42,7 +43,7 @@ public sealed class TokenUtility(IConfiguration configuration)
     /// Generate JWT token which contains <paramref name="dataBody"/>,
     /// the generated token live for the date <paramref name="validTo"/>
     /// </summary>
-    /// <param name="dataBody">data is array of value pair for its type and value</param>
+    /// <param name="dataBody">data is an array of value pairs for its type and value</param>
     /// <param name="validTo">The date which token will be expired</param>
     /// <returns>generated token as encoded string</returns>
     /// <exception cref="Exception">app setting is not valid</exception>

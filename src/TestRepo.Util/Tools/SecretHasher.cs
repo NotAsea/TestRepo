@@ -1,8 +1,11 @@
 ﻿using System.Security.Cryptography;
 using Cysharp.Text;
+using JetBrains.Annotations;
+using Open.Text;
 
 namespace TestRepo.Util.Tools;
 
+[PublicAPI]
 public static class SecretHasher
 {
     private const int SaltSize = 16; // 128 bits
@@ -16,6 +19,9 @@ public static class SecretHasher
     /// </summary>
     /// <param name="input">input string, often password</param>
     /// <returns>hash with embed salt, iteration, hash algorithm in the end</returns>
+    /// <remarks>
+    /// async version of <see cref="Hash"/>
+    /// </remarks>
     public static ValueTask<string> HashAsync(string input) => ValueTask.FromResult(Hash(input));
 
     /// <summary>
@@ -43,18 +49,29 @@ public static class SecretHasher
     /// <param name="input">often password to verify</param>
     /// <param name="hashString">a hash password hashed by <see cref="HashAsync" /></param>
     /// <returns>true if equal, false otherwise</returns>
-    /// <remarks>
-    ///     This function used to have sync version. But typically async nature of ASP.Net core, sync version was remove as we
-    ///     ought to go async anyway.
-    /// </remarks>
-    public static ValueTask<bool> VerifyAsync(string input, string hashString)
+    public static bool Verify(string input, string hashString)
     {
-        var segments = hashString.Split(SegmentDelimiter);
+        var segments = hashString
+            .SplitAsSegments(SegmentDelimiter, StringSplitOptions.RemoveEmptyEntries)
+            .ToArray();
         var hash = Convert.FromHexString(segments[0]);
         var salt = Convert.FromHexString(segments[1]);
         var iterations = int.Parse(segments[2]);
-        var algorithm = new HashAlgorithmName(segments[3]);
+        var algorithm = new HashAlgorithmName(segments[3].ToString());
         var inputHash = Rfc2898DeriveBytes.Pbkdf2(input, salt, iterations, algorithm, hash.Length);
-        return ValueTask.FromResult(CryptographicOperations.FixedTimeEquals(inputHash, hash));
+        return CryptographicOperations.FixedTimeEquals(inputHash, hash);
     }
+
+    /// <summary>
+    ///   Verify <paramref name="input"></paramref> with <paramref name="hashString" />, this function uses
+    ///   <see cref="CryptographicOperations" /> for fixed time equal to defend time guessing.
+    /// </summary>
+    /// <param name="input">often password to verify</param>
+    /// <param name="hashString">a hash password hashed by <see cref="HashAsync" /></param>
+    /// <returns>true if equal, false otherwise</returns>
+    /// <remarks>
+    ///  async version of <see cref="Verify"/>
+    /// </remarks>
+    public static ValueTask<bool> VerifyAsync(string input, string hashString) =>
+        ValueTask.FromResult(Verify(input, hashString));
 }

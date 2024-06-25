@@ -74,7 +74,6 @@ internal static class StartupAction
                 path,
                 accounts,
                 static (a) =>
-
                     [
                         new PropertySelect(nameof(a.UserName), a.UserName),
                         new PropertySelect(nameof(a.Password), a.Password)
