@@ -19,16 +19,18 @@ public static class AuthenticationSetup
             })
             .AddJwtBearer(opt =>
             {
+                var secKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(
+                        configuration["Jwt:Key"]
+                        ?? throw new Exception("Not found Secret key in appsettings.json")
+                    )
+                );
                 opt.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = configuration["Jwt:Issuer"],
                     ValidAudience = configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(
-                            configuration["Jwt:Key"]
-                            ?? throw new Exception("Not found Secret key in appsettings.json")
-                        )
-                    ),
+                    IssuerSigningKey = secKey,
+                    TokenDecryptionKey = secKey,
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = false,

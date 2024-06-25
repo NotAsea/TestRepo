@@ -65,16 +65,18 @@ public sealed class TokenUtility(IConfiguration configuration)
                 return new Claim(type.ToStringFast(), value);
             })
         );
-
+        var secKey = new SymmetricSecurityKey(key);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = claimIdentity,
             Expires = validTo,
             Issuer = issuer,
             Audience = audience,
-            SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha512Signature
+            SigningCredentials = new(secKey, SecurityAlgorithms.HmacSha512Signature),
+            EncryptingCredentials = new(
+                secKey,
+                JwtConstants.DirectKeyUseAlg,
+                SecurityAlgorithms.Aes256CbcHmacSha512
             )
         };
 
