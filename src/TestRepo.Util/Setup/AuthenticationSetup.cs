@@ -16,7 +16,7 @@ public static class AuthenticationSetup
                 opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(opt =>
+            .AddJwtBearer((opt) =>
             {
                 var secKey = new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(

@@ -21,7 +21,7 @@ internal sealed class AccountService(
     public Task<PersonAccount?> GetFromPersonId(int id) =>
         memoryCache.GetOrCreateAsync(
             id,
-            async (cacheKey) =>
+            async cacheKey =>
             {
                 cacheKey.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
                 cacheKey.SlidingExpiration = TimeSpan.FromMinutes(30);

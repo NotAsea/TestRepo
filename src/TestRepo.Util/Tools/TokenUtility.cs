@@ -15,7 +15,7 @@ public enum AppTokenType
 }
 
 [RegisterSingleton]
-public sealed class TokenUtility(IConfiguration configuration)
+public sealed class TokenUtility(ITokenParameterFactory parameterFactory)
 {
     /// <summary>
     /// Generate JWT token which contains <paramref name="dataBody"/>,
@@ -51,12 +51,7 @@ public sealed class TokenUtility(IConfiguration configuration)
     {
         if (dataBody.Length == 0)
             throw new AggregateException("dataBody must have element");
-        var issuer = configuration["Jwt:Issuer"];
-        var audience = configuration["Jwt:Audience"];
-        var key = Encoding.UTF8.GetBytes(
-            configuration["Jwt:Key"]
-                ?? throw new Exception("Not found Secret key in appsettings.json")
-        );
+        var tokenDescriptor = parameterFactory.GetSecurityTokenDescriptor();
         var claimIdentity = new ClaimsIdentity(
             dataBody.Select(x =>
             {
@@ -66,21 +61,8 @@ public sealed class TokenUtility(IConfiguration configuration)
                 return new Claim(type.ToStringFast(), value);
             })
         );
-        var secKey = new SymmetricSecurityKey(key);
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = claimIdentity,
-            Expires = validTo,
-            Issuer = issuer,
-            Audience = audience,
-            SigningCredentials = new(secKey, SecurityAlgorithms.HmacSha512Signature),
-            EncryptingCredentials = new(
-                secKey,
-                JwtConstants.DirectKeyUseAlg,
-                SecurityAlgorithms.Aes256CbcHmacSha512
-            )
-        };
-
+        tokenDescriptor.Subject = claimIdentity;
+        tokenDescriptor.Expires = validTo;
         var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return ValueTask.FromResult(tokenHandler.WriteToken(token));
