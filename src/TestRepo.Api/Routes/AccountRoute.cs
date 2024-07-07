@@ -27,7 +27,8 @@ internal static class AccountRoute
         var (logger, _, _, _) = param;
         try
         {
-            var result = await context.GetPersonFromToken().ConfigureAwait(false);
+            await Task.CompletedTask.ConfigureAwait(false);
+            var result = context.GetPersonFromToken();
             return TypedResults.Ok(result);
         }
         catch (Exception ex)
@@ -176,7 +177,8 @@ internal static class AccountRoute
         var (logger, _, _, _) = param;
         try
         {
-            return TypedResults.Ok(await context.GetPersonFromToken().ConfigureAwait(true));
+            await Task.CompletedTask.ConfigureAwait(false);
+            return TypedResults.Ok(context.GetPersonFromToken());
         }
         catch (Exception ex)
         {

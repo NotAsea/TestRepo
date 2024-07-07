@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-
+﻿using TestRepo.Api.Middlewares;
 using TestRepo.Api.Models.AccountModels;
 using TestRepo.Util.Setup;
 
@@ -11,6 +10,7 @@ internal static class SetupWebApp
     {
         public string Host { get; set; } = string.Empty;
     }
+
     /// <summary>
     ///     All App Service should register here to keep the main program clean
     /// </summary>
@@ -52,6 +52,7 @@ internal static class SetupWebApp
         app.UseSwagger();
         app.UseSwaggerUI();
         app.UseHttpsRedirection();
+        app.UseAppAccountMiddleware();
         return app.InitialDb();
     }
 
