@@ -1,23 +1,23 @@
-﻿namespace TestRepo.Service.Models;
+﻿using ValidationResult = FluentValidation.Results.ValidationResult;
+
+namespace TestRepo.Service.Models;
 
 public record AccountModel(int Id, string UserName, string Password, int PersonId)
 {
     public AccountModel()
-        : this(0, "", "", 0)
-    {
-    }
+        : this(0, "", "", 0) { }
 }
 
 #region Mapper, Serailizer, Validator
 
-[RegisterSingleton(typeof(IValidator<AccountModel>))]
-public sealed class AccountValidator : AbstractValidator<AccountModel>
+public static class AccountModelValidatorInlineExtensions
 {
-    public AccountValidator()
-    {
-        RuleFor(x => x.UserName).NotEmpty().WithMessage(Constant.ValueIsNull);
-        RuleFor(x => x.Password).NotEmpty().WithMessage(Constant.ValueIsNull);
-    }
+    public static ValidationResult Validate(this AccountModel accountModel) =>
+        new InlineValidator<AccountModel>
+        {
+            v => v.RuleFor(x => x.UserName).NotEmpty().WithMessage(Constant.ValueIsNull),
+            v => v.RuleFor(x => x.Password).NotEmpty().WithMessage(Constant.ValueIsNull),
+        }.Validate(accountModel);
 }
 
 public record ListAccount(List<AccountModel> Data, long Count);

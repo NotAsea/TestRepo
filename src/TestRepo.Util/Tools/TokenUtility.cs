@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using NetEscapades.EnumGenerators;
+using TestRepo.Util.Helper;
 
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -57,15 +58,15 @@ public sealed class TokenUtility(ITokenParameterFactory parameterFactory)
             {
                 var (type, value) = x;
                 if (!AppTokenTypeExtensions.IsDefined(type))
-                    throw new Exception("Invalid token type");
+                    throw new("Invalid token type");
                 return new Claim(type.ToStringFast(), value);
             })
         );
         tokenDescriptor.Subject = claimIdentity;
         tokenDescriptor.Expires = validTo;
-        var tokenHandler = new JwtSecurityTokenHandler();
+        var tokenHandler = JwtSecurityTokenHandlerContainer.Instance;
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        return ValueTask.FromResult(tokenHandler.WriteToken(token));
+        return ValueTask.FromResult(token);
     }
 }
 

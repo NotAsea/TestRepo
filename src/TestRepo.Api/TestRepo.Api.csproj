@@ -11,23 +11,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Remove="appsettings.Docker.json"/>
+        <Content Remove="appsettings.Docker.json" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="appsettings.Docker.json"/>
+        <None Include="appsettings.Docker.json" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.10" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TestRepo.Service\TestRepo.Service.csproj"/>
+        <ProjectReference Include="..\TestRepo.Service\TestRepo.Service.csproj" />
     </ItemGroup>
 
 </Project>

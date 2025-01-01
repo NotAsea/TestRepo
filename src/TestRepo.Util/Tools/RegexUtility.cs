@@ -10,7 +10,10 @@ public static partial class RegexUtility
     [GeneratedRegex(Constant.PasswordRegex, RegexOptions.CultureInvariant)]
     private static partial Regex PasswordRegex();
 
-    public static bool VerifyEmail(string email) => EmailRegex().IsMatch(email);
+    private static readonly Regex CacheEmailRegex = EmailRegex();
+    private static readonly Regex CachePasswordRegex = PasswordRegex();
 
-    public static bool VerifyPassword(string password) => PasswordRegex().IsMatch(password);
+    public static bool VerifyEmail(string email) => CacheEmailRegex.IsMatch(email);
+
+    public static bool VerifyPassword(string password) => CachePasswordRegex.IsMatch(password);
 }

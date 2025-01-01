@@ -1,4 +1,5 @@
 ﻿using TestRepo.Util.Tools;
+using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace TestRepo.Service.Models;
 
@@ -17,17 +18,23 @@ public record PersonModel
 
 #region Validator, Mapper, Serializer
 
-[RegisterSingleton(typeof(IValidator<PersonModel>))]
-public sealed class PersonValidator : AbstractValidator<PersonModel>
+public static class PersonValidatorExtensions
 {
-    public PersonValidator()
-    {
-        RuleFor(x => x.Name).NotEmpty().WithMessage(Constant.ValueIsNull);
-        RuleFor(x => x.Email)
-            .Must(RegexUtility.VerifyEmail!)
-            .WithMessage(Constant.WrongEmailFormat)
-            .When(x => x.Email.NotNull());
-    }
+    /// <summary>
+    /// Validate <see cref="PersonModel"/>
+    /// </summary>
+    /// <param name="model">data to validate</param>
+    /// <returns>Validation Result</returns>
+    public static ValidationResult Validate(this PersonModel model) =>
+        new InlineValidator<PersonModel>
+        {
+            v => v.RuleFor(x => x.Name).NotEmpty().WithMessage(Constant.ValueIsNull),
+            v =>
+                v.RuleFor(x => x.Email)
+                    .Must(RegexUtility.VerifyEmail!)
+                    .WithMessage(Constant.WrongEmailFormat)
+                    .When(x => x.Email.NotNull()),
+        }.Validate(model);
 }
 
 public record ListReturn(List<PersonModel> Data, long Count);

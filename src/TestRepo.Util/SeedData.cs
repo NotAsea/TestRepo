@@ -80,7 +80,7 @@ public static class BogusPasswordGenExt
         var chars = s.ToString();
         var charsShuffled = r.Shuffle(chars).ToArray();
 
-        return new string(charsShuffled);
+        return new(charsShuffled);
     }
 }
 

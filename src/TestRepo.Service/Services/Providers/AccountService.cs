@@ -54,7 +54,7 @@ internal sealed class AccountService(
     {
         var entity =
             await _repository.GetByIdAsync<Account>(id, true).ConfigureAwait(true)
-            ?? throw new Exception("Not found Account");
+            ?? throw new("Not found Account");
         if (isForce)
         {
             await RemoveToDatabase(entity).ConfigureAwait(false);
@@ -75,12 +75,12 @@ internal sealed class AccountService(
             .ConfigureAwait(true);
         if (entities is null or { Count: 0 })
         {
-            throw new Exception("Not found Account");
+            throw new("Not found Account");
         }
 
         if (isForce)
         {
-            await RemoveToDatabase(entities as IEnumerable<Account>).ConfigureAwait(false);
+            await RemoveToDatabase<Account>(entities).ConfigureAwait(false);
         }
         else
         {

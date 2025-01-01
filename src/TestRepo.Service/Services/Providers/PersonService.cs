@@ -21,7 +21,7 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
         {
             PageIndex = index,
             PageSize = size,
-            OrderByDynamic = (sortBy, sortType)
+            OrderByDynamic = (sortBy, sortType),
         };
         if (nameSearch.NotNull())
         {
@@ -64,12 +64,12 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
             .ConfigureAwait(true);
         if (people is null or { Count: 0 })
         {
-            throw new Exception("Not found People");
+            throw new("Not found People");
         }
 
         if (isForce)
         {
-            await RemoveToDatabase(people as IEnumerable<Person>).ConfigureAwait(false);
+            await RemoveToDatabase<Person>(people).ConfigureAwait(false);
         }
         else
         {
@@ -88,7 +88,7 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
     {
         var person =
             await _repository.GetByIdAsync<Person>(id, true).ConfigureAwait(true)
-            ?? throw new Exception("Not found Person");
+            ?? throw new("Not found Person");
         if (isForce)
         {
             await RemoveToDatabase(person).ConfigureAwait(false);
@@ -104,7 +104,7 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
     {
         var person =
             await _repository.GetByIdAsync<Person>(id, true).ConfigureAwait(true)
-            ?? throw new Exception("No person found");
+            ?? throw new("No person found");
         person.IsDeleted = false;
         await UpdateToDatabase(person).ConfigureAwait(false);
     }
@@ -116,7 +116,7 @@ internal sealed class PersonService(IRepository repository, MyAppContext context
             .ConfigureAwait(true);
         if (people is null or { Count: 0 })
         {
-            throw new Exception("No person found");
+            throw new("No person found");
         }
 
         await UpdateToDatabase(

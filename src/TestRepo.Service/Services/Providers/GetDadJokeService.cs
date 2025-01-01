@@ -47,7 +47,7 @@ internal sealed class GetDadJokeService(HttpClient httpClient) : IGetDadJokeServ
             "My Library (https://github.com/NotAsea/TestRepo.git)"
         );
         client.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue(mediaQueryType)
+            new(mediaQueryType)
         );
     }
 }

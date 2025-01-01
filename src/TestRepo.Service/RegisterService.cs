@@ -14,8 +14,8 @@ public static class RegisterService
         services
             .AddHttpClient<IGetDadJokeService, GetDadJokeService>(config =>
             {
-                config.BaseAddress = new Uri(
-                    configuration["DadJokeUrl"] ?? throw new Exception("Not found Url")
+                config.BaseAddress = new(
+                    configuration["DadJokeUrl"] ?? throw new("Not found Url")
                 );
             })
             .ConfigurePrimaryHttpMessageHandler(

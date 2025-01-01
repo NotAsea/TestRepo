@@ -1,14 +1,14 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using TestRepo.Util.Helper;
 
 namespace TestRepo.Api.Middlewares;
 
-file sealed class JwtExtractMiddleware(RequestDelegate next)
+internal sealed class JwtExtractMiddleware(
+    IAccountService accountService,
+    ITokenParameterFactory tokenValidationParameterFactory
+) : IMiddleware
 {
-    public async Task InvokeAsync(
-        HttpContext context,
-        IAccountService accountService,
-        ITokenParameterFactory tokenValidationParameterFactory
-    )
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         if (context.User.Identity is null or { IsAuthenticated: false })
         {
@@ -21,11 +21,15 @@ file sealed class JwtExtractMiddleware(RequestDelegate next)
         if (string.IsNullOrEmpty(rawTokenString))
             return;
         var tokenString = rawTokenString[7..];
-        var handler = new JwtSecurityTokenHandler();
-        handler.ValidateToken(tokenString, tokenValidationParameter, out var validatedToken);
-        var token = (JwtSecurityToken)validatedToken;
+        var handler = JwtSecurityTokenHandlerContainer.Instance;
+        var validationResult = await handler
+            .ValidateTokenAsync(tokenString, tokenValidationParameter)
+            .ConfigureAwait(false);
+        if (!validationResult.IsValid)
+            throw new InvalidDataException("Verify token failed");
+        var token = (JwtSecurityToken)validationResult.SecurityToken;
         var id =
-            token.GetFromJwt(AppTokenType.Id) ?? throw new Exception("Not found Id from token");
+            token.GetFromJwt(AppTokenType.Id) ?? throw new("Not found Id from token");
         context.Items["AppAccount"] = await accountService
             .GetFromPersonId(int.Parse(id))
             .ConfigureAwait(false);

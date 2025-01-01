@@ -28,6 +28,7 @@ internal static class SetupWebApp
             var httpContext = p.GetRequiredService<IHttpContextAccessor>().HttpContext!;
             return logFactory.CreateLogger(httpContext.Request.Path);
         });
+        builder.Services.AddTransient<JwtExtractMiddleware>();
         builder.Services.ConfigureHttpJsonOptions(config =>
         {
             config.SerializerOptions.TypeInfoResolverChain.Add(PersonSerializer.Default);
@@ -39,6 +40,7 @@ internal static class SetupWebApp
                 PersonAccountSerializerContext.Default
             );
         });
+        builder.Services.AddProblemDetails().AddExceptionHandler<GlobalExceptionHandler>();
     }
 
     /// <summary>
@@ -47,16 +49,18 @@ internal static class SetupWebApp
     /// </summary>
     /// <param name="app"></param>
     /// <returns></returns>
-    internal static Task StartupAction(this WebApplication app)
+    internal static Task StartupActionAsync(this WebApplication app)
     {
         app.UseSwagger();
         app.UseSwaggerUI();
         app.UseHttpsRedirection();
         app.UseAppAccountMiddleware();
-        return app.InitialDb();
+        app.UseStatusCodePages();
+        app.UseExceptionHandler();
+        return app.InitialDbAsync();
     }
 
-    private static async Task InitialDb(this WebApplication app)
+    private static async Task InitialDbAsync(this WebApplication app)
     {
         try
         {

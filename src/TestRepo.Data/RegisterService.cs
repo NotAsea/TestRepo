@@ -75,8 +75,8 @@ internal static class StartupAction
                 accounts,
                 static (a) =>
                     [
-                        new PropertySelect(nameof(a.UserName), a.UserName),
-                        new PropertySelect(nameof(a.Password), a.Password)
+                        new(nameof(a.UserName), a.UserName),
+                        new(nameof(a.Password), a.Password)
                     ]
             )
             .ConfigureAwait(false);

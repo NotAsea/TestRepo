@@ -6,7 +6,7 @@ builder.RegisterService();
 
 var app = builder.Build();
 
-await app.StartupAction().ConfigureAwait(false);
+await app.StartupActionAsync().ConfigureAwait(false);
 
 app.MapGroup("/person").WithTags("Person").HandlePersonRoute();
 app.MapGroup("/account").WithTags("Account").HandleAccountRoute();

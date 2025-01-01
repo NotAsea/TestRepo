@@ -36,7 +36,7 @@ internal sealed class TokenParameterFactory(IConfiguration configuration) : ITok
         var secKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(
                 configuration["Jwt:Key"]
-                    ?? throw new Exception("Not found Secret key in appsettings.json")
+                    ?? throw new("Not found Secret key in appsettings.json")
             )
         );
         _tokenValidation = new()
@@ -47,7 +47,7 @@ internal sealed class TokenParameterFactory(IConfiguration configuration) : ITok
             TokenDecryptionKey = secKey,
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = false,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true
         };
         return _tokenValidation;
@@ -63,7 +63,7 @@ internal sealed class TokenParameterFactory(IConfiguration configuration) : ITok
         var audience = configuration["Jwt:Audience"];
         var key = Encoding.UTF8.GetBytes(
             configuration["Jwt:Key"]
-                ?? throw new Exception("Not found Secret key in appsettings.json")
+                ?? throw new("Not found Secret key in appsettings.json")
         );
         var secKey = new SymmetricSecurityKey(key);
         _tokenDescriptor = new()

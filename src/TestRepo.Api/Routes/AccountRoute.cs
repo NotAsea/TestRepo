@@ -1,5 +1,7 @@
 ﻿using TestRepo.Api.Models.AccountModels;
 
+// ReSharper disable AsyncApostle.AsyncMethodNamingHighlighting
+
 namespace TestRepo.Api.Routes;
 
 internal static class AccountRoute
@@ -59,13 +61,13 @@ internal static class AccountRoute
 
     private static async Task<Results<Ok<string>, BadRequest<string>>> Login(
         [AsParameters] AccountServiceParam param,
-        IValidator<AccountModel> validator,
         AccountModel model
     )
     {
         var (logger, service, personService, jwtToken) = param;
 
-        var msg = await validator.ValidateAsync(model).ConfigureAwait(true);
+        // var msg = await validator.ValidateAsync(model).ConfigureAwait(true);
+        var msg = model.Validate();
         if (!msg.IsValid)
         {
             return TypedResults.BadRequest(msg.ToString("-"));
@@ -86,7 +88,7 @@ internal static class AccountRoute
 
             var person = await personService.GetPerson(account.PersonId).ConfigureAwait(true);
             var token = await jwtToken
-                .GetTokenForDay([new TokenBody(AppTokenType.Id, person.Id.ToString())])
+                .GetTokenForDay([new(AppTokenType.Id, person.Id.ToString())])
                 .ConfigureAwait(true);
             return TypedResults.Ok(token);
         }
@@ -100,12 +102,11 @@ internal static class AccountRoute
 
     private static async Task<Results<Ok<string>, BadRequest<string>>> Register(
         [AsParameters] AccountServiceParam param,
-        IValidator<AccountRegisterModel> validator,
         AccountRegisterModel model
     )
     {
         var (logger, accountService, personService, jwtToken) = param;
-        var msg = await validator.ValidateAsync(model).ConfigureAwait(true);
+        var msg = model.Validate();
         if (!msg.IsValid)
         {
             return TypedResults.BadRequest(msg.ToString("-"));
@@ -133,8 +134,8 @@ internal static class AccountRoute
             var token = await jwtToken
                 .GetTokenForDay(
                     [
-                        new TokenBody(AppTokenType.Id, person.Id.ToString()),
-                        new TokenBody(AppTokenType.Name, person.Name)
+                        new(AppTokenType.Id, person.Id.ToString()),
+                        new(AppTokenType.Name, person.Name)
                     ]
                 )
                 .ConfigureAwait(true);

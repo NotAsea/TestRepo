@@ -10,7 +10,7 @@ public static class AddSwaggerExt
         {
             c.AddSecurityDefinition(
                 "bearerAuth",
-                new OpenApiSecurityScheme
+                new()
                 {
                     Type = SecuritySchemeType.Http,
                     Scheme = "bearer",
@@ -19,12 +19,12 @@ public static class AddSwaggerExt
                 }
             );
             c.AddSecurityRequirement(
-                new OpenApiSecurityRequirement
+                new()
                 {
                     {
-                        new OpenApiSecurityScheme
+                        new()
                         {
-                            Reference = new OpenApiReference
+                            Reference = new()
                             {
                                 Type = ReferenceType.SecurityScheme,
                                 Id = "bearerAuth"

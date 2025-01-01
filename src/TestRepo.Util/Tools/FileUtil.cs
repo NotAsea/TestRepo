@@ -9,7 +9,8 @@ public static class FileUtil
     private static FileStream OpenFileForWrite(string filePath, bool deleteOldFile = true)
     {
         var path = Path.GetFullPath(filePath); // in case pass relative path, or else it still returns original path;
-        var folder = Path.GetDirectoryName(path);
+        var folder =
+            Path.GetDirectoryName(path) ?? throw new DirectoryNotFoundException(nameof(path));
         if (!Directory.Exists(folder))
             Directory.CreateDirectory(folder);
         if (deleteOldFile && File.Exists(path))
@@ -30,15 +31,19 @@ public static class FileUtil
         var props = propertyToWrite(data[0]);
         await using var file = OpenFileForWrite(filePath, deleteOldFile);
         await using var writer = new StreamWriter(file);
-        await writer.WriteLineAsync(
-            ZString.Join(',', props.Gen().Select(new SelectPropertyName()).ToList())
-        ).ConfigureAwait(false);
+        await writer
+            .WriteLineAsync(
+                ZString.Join(',', props.Gen().Select(new SelectPropertyName()).ToList())
+            )
+            .ConfigureAwait(false);
         foreach (var d in data)
         {
             var prop = propertyToWrite(d);
-            await writer.WriteLineAsync(
-                ZString.Join(',', prop.Gen().Select(new SelectPropertyValue()).ToList())
-            ).ConfigureAwait(false);
+            await writer
+                .WriteLineAsync(
+                    ZString.Join(',', prop.Gen().Select(new SelectPropertyValue()).ToList())
+                )
+                .ConfigureAwait(false);
         }
     }
 }

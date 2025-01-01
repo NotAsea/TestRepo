@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using FluentValidation.Results;
 using Riok.Mapperly.Abstractions;
 
 namespace TestRepo.Api.Models.AccountModels;
@@ -13,23 +14,29 @@ public record AccountRegisterModel(
 
 #region Validator, Serailizer, Mapper
 
-[RegisterSingleton(typeof(IValidator<AccountRegisterModel>))]
-public sealed class AccountRegisterModelValidator : AbstractValidator<AccountRegisterModel>
+public static class AccountRegisterModelValidatorExtensions
 {
-    public AccountRegisterModelValidator()
+    private static void Configure(InlineValidator<AccountRegisterModel> v)
     {
-        RuleFor(x => x.UserName).NotEmpty().WithMessage(Constant.ValueIsNull);
-        RuleFor(x => x.Name).NotEmpty().WithMessage(Constant.ValueIsNull);
-        RuleFor(x => x.Password)
+        v.RuleFor(x => x.UserName).NotEmpty().WithMessage(Constant.ValueIsNull);
+        v.RuleFor(x => x.Name).NotEmpty().WithMessage(Constant.ValueIsNull);
+        v.RuleFor(x => x.Password)
             .NotEmpty()
             .WithMessage(Constant.ValueIsNull)
             .Must(RegexUtility.VerifyPassword)
             .WithMessage(Constant.WrongPasswordFormat)
             .When(x => x.Password.NotNull(), ApplyConditionTo.CurrentValidator);
-        RuleFor(x => x.Email)
+        v.RuleFor(x => x.Email)
             .Must(RegexUtility.VerifyEmail!)
             .WithMessage(Constant.WrongEmailFormat)
             .When(x => x.Email.NotNull());
+    }
+
+    public static ValidationResult Validate(this AccountRegisterModel model)
+    {
+        var inlineValidator = new InlineValidator<AccountRegisterModel>();
+        Configure(inlineValidator);
+        return inlineValidator.Validate(model);
     }
 }
 

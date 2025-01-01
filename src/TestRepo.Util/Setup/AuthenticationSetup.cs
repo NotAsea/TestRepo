@@ -21,10 +21,10 @@ public static class AuthenticationSetup
                 var secKey = new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(
                         configuration["Jwt:Key"]
-                        ?? throw new Exception("Not found Secret key in appsettings.json")
+                        ?? throw new("Not found Secret key in appsettings.json")
                     )
                 );
-                opt.TokenValidationParameters = new TokenValidationParameters
+                opt.TokenValidationParameters = new()
                 {
                     ValidIssuer = configuration["Jwt:Issuer"],
                     ValidAudience = configuration["Jwt:Audience"],
@@ -32,7 +32,7 @@ public static class AuthenticationSetup
                     TokenDecryptionKey = secKey,
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidateLifetime = false,
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true
                 };
             });
